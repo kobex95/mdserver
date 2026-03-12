@@ -54,7 +54,7 @@ cp -rf $PANEL_DIR/ssl $TEMP_DIR/ssl.bak 2>/dev/null
 
 # 复制新文件
 echo "正在更新文件..."
-cp -rf ${TEMP_DIR}/mdserver-v${VERSION}/* $PANEL_DIR/
+cp -rf ${TEMP_DIR}/mdserver-${VERSION}/* $PANEL_DIR/
 
 # 恢复配置文件
 echo "正在恢复配置文件..."
