@@ -149,15 +149,26 @@ bash <(curl --insecure -fsSL https://raw.githubusercontent.com/kobex95/mdserver/
 ```
 
 
-### 安装/更新
+### 一键安装
 
+```bash
+# 使用curl安装
+bash <(curl -fsSL https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/install.sh)
+
+# 使用wget安装
+wget -O install.sh https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/install.sh && bash install.sh
 ```
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/install.sh)
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/update.sh)
 
-wget --no-check-certificate -O install.sh https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/install.sh && bash install.sh
+### 更新面板
 
-wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/uninstall.sh && bash uninstall.sh
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/update.sh)
+```
+
+### 卸载面板
+
+```bash
+wget -O uninstall.sh https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/uninstall.sh && bash uninstall.sh
 ```
 
 ### 偶然问题

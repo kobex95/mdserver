@@ -1,294 +1,342 @@
 #!/bin/bash
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin:/opt/homebrew/bin
+# =============================================================================
+# mdserver-web 安装脚本
+# 一款简单Linux面板服务
+# =============================================================================
+
+set -e
+
+# 基础配置
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 export PATH
 
-RED='\033[31m'
-GREEN='\033[32m'
-YELLOW='\033[33m'
-BLUE='\033[34m'
-PLAIN='\033[0m'
-BOLD='\033[1m'
-SUCCESS='[\033[32mOK\033[0m]'
-COMPLETE='[\033[32mDONE\033[0m]'
-WARN='[\033[33mWARN\033[0m]'
-ERROR='[\033[31mERROR\033[0m]'
-WORKING='[\033[34m*\033[0m]'
+# 颜色定义
+readonly RED='\033[31m'
+readonly GREEN='\033[32m'
+readonly YELLOW='\033[33m'
+readonly BLUE='\033[34m'
+readonly PLAIN='\033[0m'
+readonly SUCCESS="[${GREEN}OK${PLAIN}]"
+readonly ERROR="[${RED}ERROR${PLAIN}]"
 
+# GitHub仓库配置
+readonly GITHUB_USER="kobex95"
+readonly GITHUB_REPO="mdserver"
+readonly GITHUB_URL="https://github.com/${GITHUB_USER}/${GITHUB_REPO}"
+readonly RAW_URL="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}"
 
-# LANG=en_US.UTF-8
-is64bit=`getconf LONG_BIT`
+# 国内镜像代理
+GH_PROXIES=(
+    "https://gh-proxy.com/"
+    "https://ghfast.top/"
+    "https://ghproxy.net/"
+)
 
-if [ -f /www/server/mdserver-web/tools.py ];then
-	echo -e "存在旧版代码,不能安装!,已知风险的情况下" 
-	echo -e "rm -rf /www/server/mdserver-web"
-	echo -e "可安装!" 
-	exit 0
-fi
+# 日志文件
+LOG_FILE="/var/log/mw-install.log"
 
-LOG_FILE=/var/log/mw-install.log
-{
+# 检测是否为国内网络
+detect_network() {
+    local country
+    country=$(curl -fsSL -m 5 -s http://ipinfo.io/json 2>/dev/null | grep -o '"country": "[^"]*"' | cut -d'"' -f4)
+    if [[ "$country" == "CN" ]]; then
+        echo "cn"
+    else
+        echo "global"
+    fi
+}
 
-HTTP_PREFIX="https://"
-LOCAL_ADDR=common
-cn=$(curl -fsSL -m 10 -s http://ipinfo.io/json | grep "\"country\": \"CN\"")
-if [ ! -z "$cn" ] || [ "$?" == "0" ] ;then
-	LOCAL_ADDR=cn
-fi
-
-if [ "$LOCAL_ADDR" != "common" ];then
-	declare -A PROXY_URL
-	PROXY_URL["gh_proxy_com"]="https://gh-proxy.com/"
-    PROXY_URL["github_do"]="https://github.do/"
-    PROXY_URL["gh_llkk_cc"]="https://gh.llkk.cc/https://"
-    PROXY_URL["gh_felicity_ac_cn"]="https://gh.felicity.ac.cn/https://"
-    PROXY_URL["ghfast_top"]="https://ghfast.top/"
-    PROXY_URL["ghproxy_net"]="https://ghproxy.net/"
-    PROXY_URL["gh_927223_xyz"]="https://gh.927223.xyz/https://"
-    PROXY_URL["gh_proxy_net"]="https://gh-proxy.net/"
+# 选择GitHub代理
+select_proxy() {
+    echo -e "${BLUE}正在检测网络环境...${PLAIN}"
     
-    PROXY_URL["source"]="https://"
-
-
-	SOURCE_LIST_KEY_SORT_TMP=$(echo ${!PROXY_URL[@]} | tr ' ' '\n' | sort -n)
-	SOURCE_LIST_KEY=(${SOURCE_LIST_KEY_SORT_TMP//'\n'/})
-	SOURCE_LIST_LEN=${#PROXY_URL[*]}
-fi
-
-
-function AutoSizeStr(){
-	NAME_STR=$1
-	NAME_NUM=$2
-
-	NAME_STR_LEN=`echo "$NAME_STR" | wc -L`
-	NAME_NUM_LEN=`echo "$NAME_NUM" | wc -L`
-
-	fix_len=35
-	remaining_len=`expr $fix_len - $NAME_STR_LEN - $NAME_NUM_LEN`
-	FIX_SPACE=' '
-	for ((ass_i=1;ass_i<=$remaining_len;ass_i++))
-	do 
-		FIX_SPACE="$FIX_SPACE "
-	done
-	echo -e " ❖   ${1}${FIX_SPACE}${2})"
+    if [[ "$NETWORK_TYPE" == "global" ]]; then
+        HTTP_PREFIX="https://"
+        echo -e "${SUCCESS} 使用直连访问GitHub"
+        return 0
+    fi
+    
+    echo -e "${YELLOW}检测到国内网络，将使用镜像加速...${PLAIN}"
+    
+    # 测试可用的代理
+    for proxy in "${GH_PROXIES[@]}"; do
+        local domain
+        domain=$(echo "$proxy" | sed -E 's|https?://||g' | sed -E 's|/.*||g')
+        if ping -c 1 -W 2 "$domain" &>/dev/null; then
+            HTTP_PREFIX="$proxy"
+            echo -e "${SUCCESS} 使用代理: $proxy"
+            return 0
+        fi
+    done
+    
+    # 默认使用第一个代理
+    HTTP_PREFIX="${GH_PROXIES[0]}"
+    echo -e "${YELLOW}警告: 代理测试失败，将尝试使用默认代理${PLAIN}"
 }
 
-function ChooseProxyURL(){
-	clear
-    echo -e '+---------------------------------------------------+'
-    echo -e '|                                                   |'
-    echo -e '|   =============================================   |'
-    echo -e '|                                                   |'
-    echo -e '|     欢迎使用 Linux 一键安装mdserver-web面板源码   |'
-    echo -e '|                                                   |'
-    echo -e '|   =============================================   |'
-    echo -e '|                                                   |'
-    echo -e '+---------------------------------------------------+'
-    echo -e ''
-    echo -e '#####################################################'
-    echo -e ''
-    echo -e '            提供以下国内代理地址可供选择:                  '
-    echo -e ''
-    echo -e '#####################################################'
-    echo -e ''
-    cm_i=0
-    for V in ${SOURCE_LIST_KEY[@]}; do
-    num=`expr $cm_i + 1`
-	AutoSizeStr "${V}" "$num"
-	cm_i=`expr $cm_i + 1`
-	done
-    echo -e ''
-    echo -e '#####################################################'
-    echo -e ''
-    echo -e "        系统时间  ${BLUE}$(date "+%Y-%m-%d %H:%M:%S")${PLAIN}"
-    echo -e ''
-    echo -e '#####################################################'
-    CHOICE_A=$(echo -e "\n${BOLD}└─ 请选择并输入你想使用的代理地址 [ 1-${SOURCE_LIST_LEN} ]：${PLAIN}")
-
-    read -p "${CHOICE_A}" INPUT
-    # echo $INPUT
-    if [ "$INPUT" == "" ];then
-        INPUT=1
-        TMP_INPUT=`expr $INPUT - 1`
-        INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
-        echo -e "\n默认选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
+# 检测操作系统
+detect_os() {
+    local os_name="unknow"
+    
+    if [[ "$(uname)" == "Darwin" ]]; then
+        os_name="macos"
+    elif [[ -f /etc/os-release ]]; then
+        local id
+        id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+        case "$id" in
+            debian)
+                os_name="debian"
+                apt install -y wget curl zip unzip tar cron
+                ;;
+            ubuntu)
+                os_name="ubuntu"
+                apt install -y wget curl zip unzip tar cron
+                ;;
+            centos|rhel|rocky|almalinux|anolis)
+                os_name="rhel"
+                yum install -y wget curl zip unzip tar crontabs
+                ;;
+            fedora)
+                os_name="rhel"
+                yum install -y wget curl zip unzip tar crontabs
+                ;;
+            alpine)
+                os_name="alpine"
+                apk update
+                apk add wget curl zip unzip tar
+                ;;
+            opensuse*)
+                os_name="opensuse"
+                zypper refresh
+                zypper install -y cron wget curl zip unzip
+                ;;
+            amzn)
+                os_name="amazon"
+                yum install -y wget curl zip unzip tar crontabs
+                ;;
+            euler|openeuler)
+                os_name="euler"
+                yum install -y wget curl zip unzip tar crontabs
+                ;;
+        esac
+    elif [[ -f /etc/freebsd-version ]]; then
+        os_name="freebsd"
+        pkg install -y wget curl zip unzip
     fi
-
-    if [ "$INPUT" -lt "0" ];then
-		INPUT=1
-		TMP_INPUT=`expr $INPUT - 1`
-		INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
-		echo -e "\n低于边界错误!选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
-		sleep 2s
-	fi
-
-	if [ "$INPUT" -gt "${SOURCE_LIST_LEN}" ];then
-		INPUT=${SOURCE_LIST_LEN}
-		TMP_INPUT=`expr $INPUT - 1`
-		INPUT_KEY=${SOURCE_LIST_KEY[$TMP_INPUT]}
-		echo -e "\n超出边界错误!选择[${BLUE}${INPUT_KEY}${PLAIN}]安装！"
-		sleep 2s
-	fi
-
-    INPUT=`expr $INPUT - 1`
-    INPUT_KEY=${SOURCE_LIST_KEY[$INPUT]}
-    HTTP_PREFIX=${PROXY_URL[$INPUT_KEY]}
+    
+    echo "$os_name"
 }
 
-if [ "$LOCAL_ADDR" != "common" ];then
-	ChooseProxyURL
-
-	if [ "$HTTP_PREFIX" != "https://" ];then
-		DOMAIN=`echo $HTTP_PREFIX | sed 's|https://||g'`
-		DOMAIN=`echo $DOMAIN | sed 's|/||g'`
-		ping -c 3 $DOMAIN > /dev/null 2>&1
-		if [ "$?" != "0" ];then
-			echo "无效代理地址:${DOMAIN}"
-			exit
-		fi
-	fi
-fi
-
-if [ -f /etc/motd ];then
-    echo "welcome to mdserver-web panel" > /etc/motd
-fi
-
-startTime=`date +%s`
-
-_os=`uname`
-echo "use system: ${_os}"
-
-if [ ${_os} == "Darwin" ]; then
-	OSNAME='macos'
-elif grep -Eqi "openSUSE" /etc/*-release; then
-	OSNAME='opensuse'
-	zypper refresh
-	zypper install cron wget curl zip unzip
-elif grep -Eqi "FreeBSD" /etc/*-release; then
-	OSNAME='freebsd'
-	pkg install -y wget curl zip unzip unrar rar
-elif grep -Eqi "EulerOS" /etc/*-release || grep -Eqi "openEuler" /etc/*-release; then
-	OSNAME='euler'
-	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "CentOS" /etc/issue || grep -Eqi "CentOS" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "Fedora" /etc/issue || grep -Eqi "Fedora" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "Rocky" /etc/issue || grep -Eqi "Rocky" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "Anolis" /etc/issue || grep -Eqi "Anolis" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "AlmaLinux" /etc/issue || grep -Eqi "AlmaLinux" /etc/*-release; then
-	OSNAME='rhel'
-	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "Amazon Linux" /etc/issue || grep -Eqi "Amazon Linux" /etc/*-release; then
-	OSNAME='amazon'
-	yum install -y wget curl zip unzip tar crontabs
-elif grep -Eqi "Debian" /etc/issue || grep -Eqi "Debian" /etc/os-release; then
-	OSNAME='debian'
-	# apt update -y
-	apt install -y wget curl zip unzip tar cron
-elif grep -Eqi "Ubuntu" /etc/issue || grep -Eqi "Ubuntu" /etc/os-release; then
-	OSNAME='ubuntu'
-	# apt update -y
-	apt install -y wget curl zip unzip tar cron
-elif grep -Eqi "Alpine" /etc/issue || grep -Eqi "Alpine" /etc/*-release; then
-	OSNAME='alpine'
-	apk update
-	apk add devscripts -force-broken-world
-	apk add wget zip unzip tar -force-broken-world
-else
-	OSNAME='unknow'
-fi
-
-if [ "$EUID" -ne 0 ] && [ "$OSNAME" != "macos" ];then 
-	echo "Please run as root!"
- 	exit
-fi
-
-echo "LOCAL:${LOCAL_ADDR}"
-echo "OSNAME:${OSNAME}"
-
-if [ $OSNAME != "macos" ];then
-	if id www &> /dev/null ;then 
-	    echo ""
-	else
-	    groupadd www
-		useradd -g www -s /usr/sbin/nologin www
-	fi
-
-	mkdir -p /www/server
-	mkdir -p /www/wwwroot
-	mkdir -p /www/wwwlogs
-	mkdir -p /www/backup/database
-	mkdir -p /www/backup/site
-
-	if [ ! -d /www/server/mdserver-web ];then
-		curl --insecure -sSLo /tmp/master.tar.gz ${HTTP_PREFIX}github.com/kobex95/mdserver/archive/refs/heads/master.tar.gz
-		cd /tmp && tar -zxvf /tmp/master.tar.gz
-		mv -f /tmp/mdserver-web-master /www/server/mdserver-web
-		rm -rf /tmp/master.tar.gz
-		rm -rf /tmp/mdserver-web-master
-	fi
-
-	# install acme.sh
-	if [ ! -d /root/.acme.sh ];then
-	    if [ "$LOCAL_ADDR" != "common" ];then
-	        curl --insecure -sSLo /tmp/acme.sh-master.tar.gz ${HTTP_PREFIX}github.com/acmesh-official/acme.sh/archive/refs/heads/master.tar.gz
-	        tar xvzf /tmp/acme.sh-master.tar.gz -C /tmp
-	        cd /tmp/acme.sh-master
-	        bash acme.sh install
-	    else
-	    	curl -fsSL https://get.acme.sh | bash
-	    fi
-	fi
-fi
-
-echo "use system version: ${OSNAME}"
-if [ "${OSNAME}" == "macos" ];then
-	curl --insecure -fsSL ${HTTP_PREFIX}raw.githubusercontent.com/kobex95/mdserver/refs/heads/dev/scripts/install/macos.sh | bash
-else
-	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
-fi
-
-if [ "${OSNAME}" == "macos" ];then
-	echo "macos end"
-	exit 0
-fi
-
-cd /www/server/mdserver-web && bash cli.sh start
-isStart=`ps -ef|grep 'gunicorn -c setting.py app:app' |grep -v grep|awk '{print $2}'`
-n=0
-while [ ! -f /etc/rc.d/init.d/mw ];
-do
-    echo -e ".\c"
-    sleep 1
-    let n+=1
-    if [ $n -gt 20 ];then
-    	echo -e "start mw fail"
-    	exit 1
+# 创建系统用户
+create_user() {
+    if ! id www &>/dev/null; then
+        groupadd www 2>/dev/null || true
+        useradd -g www -s /usr/sbin/nologin www 2>/dev/null || true
+        echo -e "${SUCCESS} 创建用户 www"
     fi
-done
+}
 
-cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw stop
-cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw start
-cd /www/server/mdserver-web && bash /etc/rc.d/init.d/mw default
+# 创建目录结构
+create_directories() {
+    local dirs=(
+        "/www/server"
+        "/www/wwwroot"
+        "/www/wwwlogs"
+        "/www/backup/database"
+        "/www/backup/site"
+    )
+    
+    for dir in "${dirs[@]}"; do
+        mkdir -p "$dir"
+    done
+    
+    echo -e "${SUCCESS} 创建目录结构"
+}
 
-sleep 2
-if [ ! -e /usr/bin/mw ]; then
-	if [ -f /etc/rc.d/init.d/mw ];then
-		ln -s /etc/rc.d/init.d/mw /usr/bin/mw
-	fi
-fi
+# 下载并安装面板
+download_panel() {
+    local install_dir="/www/server/mdserver-web"
+    
+    if [[ -d "$install_dir" ]]; then
+        echo -e "${YELLOW}检测到已存在安装目录，跳过下载${PLAIN}"
+        return 0
+    fi
+    
+    echo -e "${BLUE}正在下载面板源码...${PLAIN}"
+    
+    local download_url="${HTTP_PREFIX}${GITHUB_URL}/archive/refs/heads/master.tar.gz"
+    local tmp_file="/tmp/mdserver-master.tar.gz"
+    
+    if ! curl --insecure -fsSL -o "$tmp_file" "$download_url"; then
+        echo -e "${ERROR} 下载失败，请检查网络连接"
+        exit 1
+    fi
+    
+    cd /tmp
+    tar -zxf "$tmp_file"
+    mv -f mdserver-master "$install_dir"
+    rm -f "$tmp_file"
+    
+    echo -e "${SUCCESS} 面板源码下载完成"
+}
 
-endTime=`date +%s`
-((outTime=(${endTime}-${startTime})/60))
-echo -e "Time consumed:\033[32m $outTime \033[0mMinute!"
+# 安装acme.sh
+install_acme() {
+    if [[ -d /root/.acme.sh ]]; then
+        echo -e "${SUCCESS} acme.sh 已安装"
+        return 0
+    fi
+    
+    echo -e "${BLUE}正在安装 acme.sh...${PLAIN}"
+    
+    if [[ "$NETWORK_TYPE" == "cn" ]]; then
+        local acme_url="${HTTP_PREFIX}github.com/acmesh-official/acme.sh/archive/refs/heads/master.tar.gz"
+        curl --insecure -fsSL -o /tmp/acme.sh.tar.gz "$acme_url"
+        tar -zxf /tmp/acme.sh.tar.gz -C /tmp
+        cd /tmp/acme.sh-master
+        bash acme.sh install
+        rm -rf /tmp/acme.sh.tar.gz /tmp/acme.sh-master
+    else
+        curl -fsSL https://get.acme.sh | bash
+    fi
+    
+    echo -e "${SUCCESS} acme.sh 安装完成"
+}
 
-} 1> >(tee $LOG_FILE) 2>&1
+# 安装依赖库
+install_libs() {
+    echo -e "${BLUE}正在安装依赖库...${PLAIN}"
+    cd /www/server/mdserver-web
+    bash scripts/lib.sh
+}
 
-echo -e "\nInstall completed. If error occurs, please contact us with the log file mw-install.log ."
-echo "安装完毕，如果出现错误，请带上同目录下的安装日志 mw-install.log 联系我们反馈."
+# 安装系统特定组件
+install_system_components() {
+    echo -e "${BLUE}正在安装 ${OSNAME} 系统组件...${PLAIN}"
+    cd /www/server/mdserver-web
+    bash "scripts/install/${OSNAME}.sh"
+}
+
+# 启动面板
+start_panel() {
+    echo -e "${BLUE}正在启动面板...${PLAIN}"
+    cd /www/server/mdserver-web
+    bash cli.sh start
+    
+    # 等待启动完成
+    local n=0
+    while [[ ! -f /etc/rc.d/init.d/mw ]]; do
+        echo -n "."
+        sleep 1
+        ((n++))
+        if [[ $n -gt 30 ]]; then
+            echo -e "\n${ERROR} 面板启动超时"
+            exit 1
+        fi
+    done
+    
+    # 重启以确保正常运行
+    bash /etc/rc.d/init.d/mw stop &>/dev/null || true
+    sleep 2
+    bash /etc/rc.d/init.d/mw start
+    bash /etc/rc.d/init.d/mw default
+    
+    # 创建快捷命令
+    if [[ ! -e /usr/bin/mw ]]; then
+        ln -sf /etc/rc.d/init.d/mw /usr/bin/mw
+        echo -e "${SUCCESS} 创建快捷命令: mw"
+    fi
+}
+
+# 设置motd
+setup_motd() {
+    if [[ -f /etc/motd ]]; then
+        echo "Welcome to mdserver-web panel" > /etc/motd
+    fi
+}
+
+# 打印安装完成信息
+print_completion() {
+    local end_time
+    end_time=$(date +%s)
+    local duration=$((end_time - START_TIME))
+    local minutes=$((duration / 60))
+    local seconds=$((duration % 60))
+    
+    echo -e "\n${GREEN}============================================${PLAIN}"
+    echo -e "${GREEN}  mdserver-web 安装完成!${PLAIN}"
+    echo -e "${GREEN}============================================${PLAIN}"
+    echo -e "安装耗时: ${minutes}分${seconds}秒"
+    echo -e "\n常用命令:"
+    echo -e "  mw start    - 启动面板"
+    echo -e "  mw stop     - 停止面板"
+    echo -e "  mw restart  - 重启面板"
+    echo -e "  mw default  - 显示登录信息"
+    echo -e "\n日志文件: ${LOG_FILE}"
+    echo -e "${GREEN}============================================${PLAIN}\n"
+}
+
+# 主函数
+main() {
+    START_TIME=$(date +%s)
+    
+    # 检查root权限
+    if [[ $EUID -ne 0 ]] && [[ "$(uname)" != "Darwin" ]]; then
+        echo -e "${ERROR} 请使用 root 用户运行此脚本"
+        exit 1
+    fi
+    
+    # 检查是否已安装
+    if [[ -f /www/server/mdserver-web/tools.py ]]; then
+        echo -e "${YELLOW}检测到已存在的安装${PLAIN}"
+        echo "如需重新安装，请先执行: rm -rf /www/server/mdserver-web"
+        exit 0
+    fi
+    
+    echo -e "${GREEN}============================================${PLAIN}"
+    echo -e "${GREEN}  mdserver-web 安装程序${PLAIN}"
+    echo -e "${GREEN}============================================${PLAIN}\n"
+    
+    # 检测网络环境
+    NETWORK_TYPE=$(detect_network)
+    select_proxy
+    
+    # 检测操作系统
+    OSNAME=$(detect_os)
+    echo -e "${SUCCESS} 检测到操作系统: ${OSNAME}"
+    
+    # macOS特殊处理
+    if [[ "$OSNAME" == "macos" ]]; then
+        echo -e "${BLUE}macOS 系统，使用远程安装脚本...${PLAIN}"
+        curl --insecure -fsSL "${HTTP_PREFIX}${RAW_URL}/master/scripts/install/macos.sh" | bash
+        exit 0
+    fi
+    
+    # 创建用户和目录
+    create_user
+    create_directories
+    
+    # 下载面板
+    download_panel
+    
+    # 安装acme.sh
+    install_acme
+    
+    # 安装依赖
+    install_libs
+    
+    # 安装系统组件
+    install_system_components
+    
+    # 设置motd
+    setup_motd
+    
+    # 启动面板
+    start_panel
+    
+    # 打印完成信息
+    print_completion
+}
+
+# 运行主函数
+main "$@" 2>&1 | tee -a "$LOG_FILE"
