@@ -35,7 +35,7 @@ if [ ! -d ${SERVER_ROOT}/libzip ];then
     fi
 
     # if [ ! -f ${SOURCE_ROOT}/libzip-1.3.2.tar.gz ];then
-    #     wget --no-check-certificate -O libzip-1.3.2.tar.gz ${HTTP_PREFIX}github.com/midoks/mdserver-web/releases/download/init/libzip-1.3.2.tar.gz -T 20
+    #     wget --no-check-certificate -O libzip-1.3.2.tar.gz ${HTTP_PREFIX}github.com/kobex95/mdserver/releases/download/init/libzip-1.3.2.tar.gz -T 20
     # fi
 
     if [ ! -f ${SOURCE_ROOT}/libzip-1.3.2.tar.gz ];then

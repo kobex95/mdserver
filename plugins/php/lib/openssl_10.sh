@@ -36,7 +36,7 @@ if [ ! -d ${SERVER_ROOT}/openssl10 ];then
     # fi
 
     if [ ! -f ${SOURCE_ROOT}/openssl-${opensslVersion}.tar.gz ];then
-        wget --no-check-certificate -O openssl-${opensslVersion}.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/openssl-${opensslVersion}.tar.gz -T 20
+        wget --no-check-certificate -O openssl-${opensslVersion}.tar.gz https://github.com/kobex95/mdserver/releases/download/init/openssl-${opensslVersion}.tar.gz -T 20
     fi
 
     tar -zxf openssl-${opensslVersion}.tar.gz

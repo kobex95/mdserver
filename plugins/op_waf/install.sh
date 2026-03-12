@@ -60,7 +60,7 @@ Install_App(){
 	# fi
 
 	if [ ! -f $serverPath/source/op_waf/lsqlite3_v096.zip ];then
-		wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip https://github.com/midoks/mdserver-web/releases/download/0.18.4/lsqlite3_v096.zip
+		wget --no-check-certificate -O $serverPath/source/op_waf/lsqlite3_v096.zip https://github.com/kobex95/mdserver/releases/download/0.18.4/lsqlite3_v096.zip
 	fi
 
 	if [ ! -d $serverPath/source/op_waf/lsqlite3_v096 ];then

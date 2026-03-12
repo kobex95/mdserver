@@ -33,7 +33,7 @@ if [ ! -d ${SERVER_ROOT}/libiconv ];then
     fi
 
     if [ ! -f ${SOURCE_ROOT}/libiconv-1.15.tar.gz ];then
-	   wget --no-check-certificate -O ${SOURCE_ROOT}/libiconv-1.15.tar.gz https://github.com/midoks/mdserver-web/releases/download/init/libiconv-1.15.tar.gz  -T 5
+	   wget --no-check-certificate -O ${SOURCE_ROOT}/libiconv-1.15.tar.gz https://github.com/kobex95/mdserver/releases/download/init/libiconv-1.15.tar.gz  -T 5
     fi
 
     if [ ! -d ${SOURCE_ROOT}/libiconv-1.15 ];then
