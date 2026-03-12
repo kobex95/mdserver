@@ -170,9 +170,14 @@ create_directories() {
 download_panel() {
     local install_dir="/www/server/mdserver-web"
     
+    # 如果目录存在但为空，则删除重新下载
     if [[ -d "$install_dir" ]]; then
-        echo -e "${YELLOW}检测到已存在安装目录，跳过下载${PLAIN}"
-        return 0
+        if [[ -z "$(ls -A "$install_dir" 2>/dev/null)" ]]; then
+            rm -rf "$install_dir"
+        else
+            echo -e "${YELLOW}检测到已存在安装目录，跳过下载${PLAIN}"
+            return 0
+        fi
     fi
     
     echo -e "${BLUE}正在下载面板源码...${PLAIN}"
@@ -187,8 +192,21 @@ download_panel() {
     
     cd /tmp
     tar -zxf "$tmp_file"
-    mv -f mdserver-master "$install_dir"
+    
+    # 查找解压后的目录（可能是 mdserver-master 或 mdserver-web-master）
+    local extracted_dir
+    extracted_dir=$(ls -d mdserver* 2>/dev/null | head -1)
+    if [[ -z "$extracted_dir" ]]; then
+        echo -e "${ERROR} 解压失败，找不到目录"
+        exit 1
+    fi
+    
+    mv -f "$extracted_dir" "$install_dir"
     rm -f "$tmp_file"
+    
+    # 创建必要的子目录
+    mkdir -p "$install_dir/data"
+    mkdir -p "$install_dir/logs"
     
     echo -e "${SUCCESS} 面板源码下载完成"
 }
