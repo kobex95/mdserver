@@ -445,7 +445,7 @@ function netImg() {
         }]
     };
 
-    var echartsNetImg = echarts.init(document.getElementById('netImg'));
+    var echartsNetImg = echarts.init(document.getElementById('trafficChart'));
     setInterval(function() {
         getNet();
         addData(true);
@@ -993,7 +993,7 @@ var index = {
                 index.net.data.zData.push(0);
             }
 
-            index.net.table = echarts.init(document.getElementById('netImg'));
+            index.net.table = echarts.init(document.getElementById('trafficChart'));
             var option = index.net.defaultOption();
             index.net.table.setOption(option);
 
@@ -1209,7 +1209,7 @@ var index = {
                 index.iostat.data.tipsData.push({});
             }
 
-            index.iostat.table = echarts.init(document.getElementById('ioStat'));
+            index.iostat.table = echarts.init(document.getElementById('diskioChart'));
             var option = index.iostat.defaultOption();
             index.iostat.table.setOption(option);
 
