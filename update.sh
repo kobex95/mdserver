@@ -7,7 +7,7 @@ PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:~/bin
 PANEL_DIR="/www/server/mdserver-web"
 TEMP_DIR="/tmp/mdserver-update"
 VERSION="0.18.5"
-REPO_URL="https://github.com/kobex95/mdserver/archive/refs/tags/${VERSION}.zip"
+REPO_URL="https://github.com/kobex95/mdserver/archive/refs/tags/v${VERSION}.zip"
 
 echo "========================================"
 echo " MW-Linux面板更新脚本"
@@ -54,7 +54,7 @@ cp -rf $PANEL_DIR/ssl $TEMP_DIR/ssl.bak 2>/dev/null
 
 # 复制新文件
 echo "正在更新文件..."
-cp -rf ${TEMP_DIR}/mdserver-${VERSION}/* $PANEL_DIR/
+cp -rf ${TEMP_DIR}/mdserver-v${VERSION}/* $PANEL_DIR/
 
 # 恢复配置文件
 echo "正在恢复配置文件..."
