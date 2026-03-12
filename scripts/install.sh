@@ -22,8 +22,8 @@ readonly ERROR="[${RED}ERROR${PLAIN}]"
 # GitHub仓库配置
 readonly GITHUB_USER="kobex95"
 readonly GITHUB_REPO="mdserver"
-readonly GITHUB_URL="https://github.com/${GITHUB_USER}/${GITHUB_REPO}"
-readonly RAW_URL="https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}"
+readonly GITHUB_HOST="github.com/${GITHUB_USER}/${GITHUB_REPO}"
+readonly RAW_HOST="raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}"
 
 # 国内镜像代理
 GH_PROXIES=(
@@ -164,7 +164,7 @@ download_panel() {
     
     echo -e "${BLUE}正在下载面板源码...${PLAIN}"
     
-    local download_url="${HTTP_PREFIX}${GITHUB_URL}/archive/refs/heads/master.tar.gz"
+    local download_url="${HTTP_PREFIX}https://${GITHUB_HOST}/archive/refs/heads/master.tar.gz"
     local tmp_file="/tmp/mdserver-master.tar.gz"
     
     if ! curl --insecure -fsSL -o "$tmp_file" "$download_url"; then
@@ -190,7 +190,7 @@ install_acme() {
     echo -e "${BLUE}正在安装 acme.sh...${PLAIN}"
     
     if [[ "$NETWORK_TYPE" == "cn" ]]; then
-        local acme_url="${HTTP_PREFIX}github.com/acmesh-official/acme.sh/archive/refs/heads/master.tar.gz"
+        local acme_url="${HTTP_PREFIX}https://github.com/acmesh-official/acme.sh/archive/refs/heads/master.tar.gz"
         curl --insecure -fsSL -o /tmp/acme.sh.tar.gz "$acme_url"
         tar -zxf /tmp/acme.sh.tar.gz -C /tmp
         cd /tmp/acme.sh-master
@@ -308,7 +308,7 @@ main() {
     # macOS特殊处理
     if [[ "$OSNAME" == "macos" ]]; then
         echo -e "${BLUE}macOS 系统，使用远程安装脚本...${PLAIN}"
-        curl --insecure -fsSL "${HTTP_PREFIX}${RAW_URL}/master/scripts/install/macos.sh" | bash
+        curl --insecure -fsSL "${HTTP_PREFIX}https://${RAW_HOST}/master/scripts/install/macos.sh" | bash
         exit 0
     fi
     
