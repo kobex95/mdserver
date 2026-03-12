@@ -1,189 +1,113 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<style type="text/css">
-#operationLog thead th:nth-child(1),
-#operationLog tbody tr td:nth-child(1){width:100px;}
-#operationLog thead th:nth-child(2),
-#operationLog tbody tr td:nth-child(2){width:130px;}
-#operationLog thead th:nth-child(4),
-#operationLog tbody tr td:nth-child(4){width:150px;}
+<!-- 页面标题 -->
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-xl font-semibold text-gray-800">日志管理</h1>
+</div>
 
+<!-- 标签页 -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div class="flex px-5 py-3 border-b border-gray-100 gap-6 tabs">
+        <div class="tab-item active" data-tab="panelLogs">面板日志</div>
+        <div class="tab-item" data-tab="logAudit">日志审计</div>
+    </div>
+</div>
 
-.logAuditContent {
-    padding: 0 0 0 15px;
-    margin-left: 15px;
-    width: 100%;
-    flex: 1;
-    border-left: 1px solid #ececec;
-}
+<!-- 面板日志 -->
+<div class="tab-content" id="panelLogs-content">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="p-4 border-b border-gray-100 flex gap-3">
+            <button class="btn btn-success" onclick="refreshLogs()">
+                <i class="fa-solid fa-rotate-right mr-2"></i>刷新日志
+            </button>
+            <button class="btn btn-danger" onclick="clearLogs()">
+                <i class="fa-solid fa-trash mr-2"></i>清空日志
+            </button>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="data-table" id="operationLog">
+                <thead>
+                    <tr>
+                        <th width="80">编号</th>
+                        <th width="120">操作类型</th>
+                        <th>详情</th>
+                        <th width="160">操作时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- 动态加载 -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="px-5 py-4 border-t border-gray-100 flex justify-between items-center">
+            <div class="text-sm text-gray-500" id="log-count">共 0 条</div>
+            <div class="page" id="logPage"></div>
+        </div>
+    </div>
+</div>
 
-.tootls_group .logs_search .search_input {
-    height: 30px;
-    line-height: 30px;
-    border-radius: 2px;
-    border: 1px solid #ccc;
-    outline: none;
-    padding-left: 8px;
-    vertical-align: top;
-    width: 230px;
-}
-
-.tootls_group .logs_search .glyphicon-search {
-    height: 28px;
-    line-height: 28px;
-    padding: 0 10px;
-    color: #888;
-    position: absolute;
-    right: 0;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-#logAudit .tootls_group {
-    justify-content: space-between;
-}
-
-#logAudit .tootls_group, #panelRun .tootls_group.tools_bottom {
-    display: flex;
-    flex-wrap: wrap;
-    height: auto;
-    line-height: inherit;
-}
-
-.logAuditTabContent {
-    display: flex;
-    height: 100%;
-}
-
-.logAuditTabContent .logAuditTab {
-    border: 1px solid #ececec;
-    overflow: auto;
-}
-
-.logAuditTabContent .logAuditTab .logAuditItem {
-    height: 35px;
-    line-height: 35px;
-    padding: 0 10px;
-    border-bottom: 1px solid #ececec;
-    cursor: pointer;
-    overflow: hidden;
-}
-
-.logAuditTabContent .logAuditTab .logAuditItem:hover, .logAuditTabContent .logAuditTab .logAuditItem.active {
-    background-color: #f2f2f2;
-}
-
-#logAuditTable thead th:nth-child(1),
-#logAuditTable tbody tr td:nth-child(1){width:;}
-#logAuditTable thead th:nth-child(2),
-#logAuditTable tbody tr td:nth-child(2){width:;}
-#logAuditTable thead th:nth-child(3),
-#logAuditTable tbody tr td:nth-child(3){width:;}
-#logAuditTable thead th:nth-child(4),
-#logAuditTable tbody tr td:nth-child(4){width:300px;}
-</style>
-
-<div class="main-content" style="min-height: 389px;">
-	<div class="container-fluid" style="padding-bottom: 50px;">
-		<div id="cutTab" class="pos-box bgw mtb15" style="height:45px">
-			<div class="tab-list">
-				<div class="tabs-item active" data-name="panelLogs">面板日志</div>
-				<div class="tabs-item" data-name="logAudit">日志审计</div>
-			</div>
-		</div>
-
-
-		<div class="bgw mtb15 pd15 tab-view-box firewall-tab-view" style="overflow: hidden;">
-
-			<!-- logs start -->
-			<div class="tab-con show w-full" id="panelLogs" style="padding: 0px;">
-				<div id="operationLog" style="position: relative;">
-					<div class="tootls_group tootls_top">
-						<div class="pull-left">
-							<button type="button" title="刷新日志" class="refresh btn btn-success btn-sm mr5">
-								<span>刷新日志</span>
-							</button>
-							<button type="button" title="清空日志" class="clear btn btn-default btn-sm mr5">
-								<span>清空日志</span>
-							</button>
-						</div>
-					</div>
-					<div class="divtable mtb10">
-						<table class="table table-hover">
-							<thead style="position: relative;z-index: 1;"><tr>
-								<th><span>编号</span></th>
-								<th><span>操作类型</span></th>
-								<th><span>详情</span></th>
-								<th><span>操作时间</span></th>
-							</tr></thead>
-							<tbody></tbody>
-						</table>
-					</div>
-				</div>
-				<div class="dataTables_paginate paging_bootstrap page operationLog">
-					<div><span class="Pcurrent">1</span><span class="Pcount">共1条</span></div>
-				</div>
-			</div>
-			<!-- logs end -->
-
-
-			<div class="tab-con hide" id="logAudit" style="height: auto;">
-				<div class="logAuditTabContent">
-					<div class="logAuditTab" style="width: 300px;overflow: hidden;overflow-y: auto;">
-					<!--	
-						<div class="logAuditItem active" title="wtmp - 登录和重启记录" data-file="/wtmp">
-							wtmp - 登录和重启记录(4.88 KB)
-						</div>
-					-->
-					</div>
-					<div class="logAuditContent" style="overflow: hidden;overflow-y: auto;">
-						<div id="logAuditTable" class="bt_table" style="display: block;">
-							<div class="tootls_group tootls_top">
-								<div class="pull-left">
-									<button type="button" title="刷新列表" class="btn btn-success btn-sm mr5"><span>刷新列表</span></button>
-								</div>
-								<div class="pull-right">
-									<div class="logs_search" style="position: relative;">
-										<input name='source' type="text" class="search_input" placeholder="请输入来源/端口/角色/事件" >
-										<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-									</div>
-								</div>
-							</div>
-							<div class="divtable mtb10" style="max-height: 83px;">
-								<table class="table table-hover">
-									<thead style="position: relative;z-index: 1;">
-										<tr>
-											<th><span data-index="0"><span>用户</span></span></th>
-											<th><span data-index="1"><span>来源</span></span></th>
-											<th><span data-index="2"><span>端口</span></span></th>
-											<th><span data-index="3"><span>时间</span></span></th>
-										</tr>
-									</thead>
-									<tbody>
-										<!-- <tr><td><span>root</span></td>
-											<td><span>117.139.193.29</span></td>
-											<td><span>pts/0</span></td>
-											<td><span>2023-08-25 13:27 still logged in</span></td>
-										</tr> -->
-									</tbody>
-								</table>
-							</div>
-							<div class="tootls_group tootls_bottom">
-								<div class="pull-left"></div>
-								<div class="pull-right">
-									<div class="page"><span class="Pcount">第 1 页</span></div>
-								</div>
-							</div>
-						</div>
-						<div id="logAuditPages" class="page" style="display: flex; justify-content: flex-end;"></div>
-						<div id="logAuditPre" style="display: none;"><pre style="height: 188px; background-color: rgb(51, 51, 51); color: rgb(255, 255, 255); overflow-x: hidden; overflow-wrap: break-word; white-space: pre-wrap;"><code></code></pre></div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+<!-- 日志审计 -->
+<div class="tab-content hidden" id="logAudit-content">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div class="flex">
+            <!-- 左侧文件列表 -->
+            <div class="w-64 border-r border-gray-200 min-h-96">
+                <div class="p-3 border-b border-gray-100">
+                    <span class="text-sm font-medium text-gray-600">日志文件</span>
+                </div>
+                <div id="logAuditFiles" class="overflow-y-auto max-h-96">
+                    <!-- 动态加载 -->
+                </div>
+            </div>
+            
+            <!-- 右侧内容 -->
+            <div class="flex-1">
+                <div class="p-4 border-b border-gray-100 flex justify-between items-center">
+                    <button class="btn btn-success" onclick="refreshAuditLog()">
+                        <i class="fa-solid fa-rotate-right mr-2"></i>刷新
+                    </button>
+                    <div class="relative">
+                        <input type="text" id="auditSearch" class="input w-64 pl-10 text-sm" placeholder="搜索...">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="data-table" id="logAuditTable">
+                        <thead>
+                            <tr>
+                                <th>用户</th>
+                                <th>来源</th>
+                                <th>端口</th>
+                                <th>时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- 动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="px-5 py-4 border-t border-gray-100 flex justify-end">
+                    <div class="page" id="auditPage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="/static/app/logs.js?v={{config.version}}"></script>
+<script>
+// 标签页切换
+$('.tab-item').click(function() {
+    var tab = $(this).data('tab');
+    $('.tab-item').removeClass('active');
+    $(this).addClass('active');
+    $('.tab-content').addClass('hidden');
+    $('#' + tab + '-content').removeClass('hidden');
+});
+</script>
 {% endblock %}

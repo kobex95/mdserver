@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>429 Too Many Requests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        .icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin: 0 0 10px 0;
+            font-size: 28px;
+        }
+        p {
+            color: #666;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+        .code {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            color: #333;
+            margin: 20px 0;
+            border-left: 4px solid #f5576c;
+        }
+        .retry {
+            color: #f5576c;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">⏱️</div>
+        <h1>429 Too Many Requests</h1>
+        <p>You have sent too many requests in a short period of time.</p>
+        <p>API rate limit has been exceeded. Please wait before making additional requests.</p>
+        <div class="code">
+            <p>Retry-After: {retry_after} seconds</p>
+            <p>Limit: {rate_limit}</p>
+            <p>Window: {rate_window}s</p>
+        </div>
+        <p class="retry">Please slow down and try again later.</p>
+        <div class="footer">Protected by OP WAF</div>
+    </div>
+</body>
+</html>

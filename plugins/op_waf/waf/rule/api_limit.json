@@ -1,0 +1,17 @@
+[
+    [1, "^/api/", "API接口默认限制", 0],
+    [1, "^/wp-json/", "WordPress API", 0],
+    [1, "^/rest/", "REST API", 0],
+    [1, "^/graphql", "GraphQL API", 0],
+    [1, "^/ajax/", "AJAX接口", 0],
+    [1, "^/admin/", "后台API", 0],
+    [1, "login|signin|auth", "登录接口", 0],
+    [1, "register|signup", "注册接口", 0],
+    [1, "upload|file", "上传接口", 0],
+    [1, "search|query", "搜索接口", 0],
+    [1, "captcha|verify|code", "验证码接口", 0],
+    [1, "password|reset|forgot", "密码重置", 0],
+    [1, "payment|pay|order|trade", "支付接口", 0],
+    [1, "webhook|callback|notify", "回调接口", 0],
+    [1, "export|import|download|backup", "数据导出", 0]
+]

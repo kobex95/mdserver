@@ -1,197 +1,169 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="main-content">
-	<div class="container-fluid" style="padding-bottom:54px">
-		<div class="pos-box bgw mtb15">
-			<div class="position f14 c9 pull-left"><a class="plr10 c4" href="/">首页</a>/<span class="plr10 c4">面板设置</span></div>
-		</div>
-		<div class="clearfix bgw mtb15 pd15">
-			<div class="safe-port pull-left">
-				<div class="ss-text pull-left mr50">
-					<em>关闭面板</em>
-					<div class="ssh-item">
-                        <input class="btswitch btswitch-ios" id="closePl" type="checkbox" {%if data['admin_close']=='yes' %}checked{%endif%}>
-                        <label class="btswitch-btn" for="closePl" onclick="closePanel()"></label>
-                    </div>
-				</div>
-				<div class="ss-text pull-left mr50">
-					<em>开发模式</em>
-					<div class="ssh-item">
-                        <input class="btswitch btswitch-ios" id="debugMode" type="checkbox" {%if data['debug']=='open'%}checked{%endif%}>
-                        <label class="btswitch-btn" for="debugMode" onclick="debugMode()"></label>
-                    </div>
-				</div>
 
-				<div class="ss-text pull-left mr50">
-                    <em title="开启后允许使用ipv6访问面板">监听IPv6</em>
-                    <div class='ssh-item'>
-                        <input class='btswitch btswitch-ios' id='panelIPv6' type='checkbox' {{data['ipv6']}}>
-                        <label class='btswitch-btn' for='panelIPv6' onclick="setIPv6()"></label>
-                    </div>
-                </div>
-			</div>
-		</div>
-		<div class="setbox bgw mtb15">
-			<div class="title c6 plr15"><h3 class="f16">设置</h3></div>
-			<div class="info-title-tips" style="margin: 20px 30px 0px;">
-				<p><span class="glyphicon glyphicon-alert" style="color: #f39c12; margin-right: 10px;"></span>为了提高安全,修改面板密码!</p>
-			</div>
-			<div class="setting-con pd15">
-				<form id="set_config">
-					<p class="mtb15">
-						<span class="set-tit text-right">别名</span>
-						<input id="webname" name="webname" class="inputtxt bt-input-text" type="text" value="{{data['title']}}">
-						<button type="button" class="btn btn-success btn-sm ml5 btn_webname" disabled>保存</button>
-						<span class="set-info c7">面板名称</span>
-					</p>
-
-					<p class="mtb15">
-						<span class="set-tit text-right" title="服务器IP">服务器IP</span>
-						<input name="host_ip" class="inputtxt bt-input-text" type="text" value="{{data['ip']}}">
-						<button type="button" class="btn btn-success btn-sm ml5 btn_host_ip" disabled>保存</button>
-						<span class="set-info c7">默认为外网IP,若您在本地虚拟机测试,请填写虚拟机内网IP!</span>
-					</p>
-
-					<p class="mtb15">
-						<span class="set-tit text-right">面板端口</span>
-						<input data-port="{{data['port']}}" id="banport" name="port" class="inputtxt bt-input-text" type="number" value="{{data['port']}}" maxlength="5">
-						<button type="button" class="btn btn-success btn-sm ml5 btn_port" disabled>保存</button>
-						<span class="set-info c7">建议端口范围7200 - 65535</span>
-					</p>
-
-					<p class="mtb15">
-						<span class="set-tit text-right">安全入口</span>
-						<input id="admin_path" name="admin_path" class="inputtxt bt-input-text disable" type="text" value="{{data['admin_path']}}">
-						<button type="button" class="btn btn-success btn-sm ml5" onclick="modifyAuthPath()">设置</button>
-						<span class="set-info c7">面板管理入口,设置后只能通过指定安全入口登录面板,如: /abc</span>
-					</p>
-
-					<p class="mtb15">
-						<span class="set-tit text-right" title="默认建站目录">默认建站目录</span>
-						<input name="sites_path" class="inputtxt bt-input-text" type="text" value="{{data['site_path']}}">
-						<button type="button" class="btn btn-success btn-sm ml5 btn_sites_path" disabled>保存</button>
-						<span class="set-info c7">新创建的站点,默认将保存到该目录的下级目录!</span>
-					</p>
-
-					<p class="mtb15">
-						<span class="set-tit text-right" title="默认建站目录">默认备份目录</span>
-						<input name="backup_path" class="inputtxt bt-input-text" type="text" value="{{data['backup_path']}}">
-						<button type="button" class="btn btn-success btn-sm ml5 btn_backup_path" disabled>保存</button>
-						<span class="set-info c7">网站和数据库的备份目录!</span>
-					</p>
-
-					<p class="mtb15">
-						<span class="set-tit text-right" title="服务器时间">服务器时间</span>
-						<input id="systemdate" name="systemdate" class="inputtxt bt-input-text disable" type="text" value="{{data['systemdate']}}">
-						<button type="button" class="btn btn-success btn-sm ml5" onclick="setTimezone()">设置</button>
-						<span class="set-info c7">设置/同步当前服务器时间</span>
-					</p>
-					<p class="mtb15">
-						<span class="set-tit text-right" title="面板用户">面板用户</span>
-						<input name="username_" class="inputtxt bt-input-text disable" type="text" value="{{data['username']}}" disabled>
-						<button type="button" class="btn btn-success btn-sm ml5" onclick="setUserName()">设置</button>
-						<span class="set-info c7">设置面板账号</span>
-					</p>
-					<p class="mtb15">
-						<span class="set-tit text-right" title="面板密码">面板密码</span>
-						<input name="password_" class="inputtxt bt-input-text disable" type="text" value="******" disabled>
-						<button type="button" class="btn btn-success btn-sm ml5" onclick="setPassword()">设置</button>
-						<span class="set-info c7">设置面板密码</span>
-					</p>
-				</form>
-			</div>
-
-			<div class="title c6 plr15"><h3 class="f16">安全</h3></div>
-			<div class="setting-con pd15">
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="绑定域名" style="float: left;">绑定域名</span>
-						<input name="bind_domain" class="inputtxt bt-input-text" type="text" value="{{data['panel_domain']}}">
-	                <button type="button" class="btn btn-success btn-sm ml5 btn_bind_domain" disabled>保存</button>
-					<span class="set-info c7">为面板绑定一个访问域名，<b style="color: red;">注意：一旦绑定域名，只能通过域名访问面板</b></span>
-				</p>
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="面板SSL" style="float: left;">面板SSL</span>
-						<input id="cfg_ssl" name="bind_ssl" class="btswitch btswitch-ios" type="checkbox" {% if data['panel_ssl']['open'] %}checked{% endif %}>
-						<label class="btswitch-btn ml5" for="cfg_ssl" style="float: left;margin-top:4px;"></label>
-	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getPanelSSL();">面板SSL配置</button>
-					<span class="set-info c7">为面板设置https协议访问，提升面板访问<b style="color: red;">安全性</b></span>
-				</p>
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="BasicAuth认证" style="float: left;">BasicAuth认证</span>
-						<input class="btswitch btswitch-ios" id="cfg_basic_auth" type="checkbox" 
-						{% if data['basic_auth']['open'] %}checked{% endif %}/>
-	                <label class="btswitch-btn ml5" for="cfg_basic_auth" style="float: left;margin-top:4px;" onclick="setBasicAuth()"></label>
-					<span class="set-info c7">为面板增加一道基于BasicAuth的认证服务，有效防止面板被扫描</span>
-				</p>
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="API接口" style="float: left;">API接口</span>
-					<input class="btswitch btswitch-ios" id="cfg_panel_api" type="checkbox" {% if data['panel_api']['open'] %}checked{% endif %}/>
-	                <label class="btswitch-btn ml5" for="cfg_panel_api" style="float: left;margin-top:4px;" onclick="setPanelApi()"></label>
-	                <button ype="button" class="btn btn-default btn-xs" style="vertical-align: middle; margin-left: 10px" onclick="appPage();">APP应用管理</button>
-					<span class="set-info c7">提供面板API接口访问的支持</span>
-				</p>
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="未认证响应状态">未认证响应状态</span>
-					<input name="status_code" class="inputtxt bt-input-text disable" type="text" value="{{data['unauthorized_status']['text']}}" disabled>
-					<button type="button" class="btn btn-success btn-sm ml5" data-code="{{data['unauthorized_status']['code']}}" onclick="setStatusCode(this)">设置</button>
-					<span class="set-info c7">用于在未登录且未正确输入安全入口时的响应，可用于隐藏面板特征</span>
-				</p>
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="临时访问授权">临时访问授权</span>
-					<button type="button" class="btn btn-success btn-sm ml5" onclick="setTempAccess()">临时访问授权管理</button>
-					<span class="set-info c7">为非管理员临时提供面板访问权限</span>
-				</p>
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="二步验证" style="float: left;">二步验证</span>
-					<input class="btswitch btswitch-ios" id="cfg_panel_auth" type="checkbox" {% if data['two_step_verification']['open'] %}checked{% endif %}/>
-	                <label class="btswitch-btn ml5" for="cfg_panel_auth" style="float: left;margin-top:4px;" onclick="setAuthSecretApi()"></label>
-					<button type="button" class="btn btn-default btn-xs" style="vertical-align: middle; margin-left: 10px" onclick="setAuthBind();">绑定设置</button>
-					<span class="set-info c7">二步验证，加强安全登录</span>
-				</p>
-			</div>
-
-
-			<div class="title c6 plr15"><h3 class="f16">通知</h3></div>
-
-			<div class="setting-con pd15">
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="TelegramBot" style="float: left;">TG机器人通知</span>
-						<input id="cfg_tgbot" name="cfg_tgbot" onclick="setNotifyTgbot(this)" class="btswitch btswitch-ios" type="checkbox" {% if data['notify_tgbot']['open'] %}checked{% endif %}>
-						<label class="btswitch-btn ml5" for="cfg_tgbot" style="float: left;margin-top:4px;"></label>
-	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getTgbot();">TelegramBot配置</button>
-					<span class="set-info c7">Telegram Bot机器人通知【<b style="color:red;">国内可能无法使用</b>】</span>
-				</p>
-
-				<p class="mtb15">
-					<span class="set-tit text-right" title="绑定账号" style="float: left;">邮件通知</span>
-						<input id="cfg_email" name="cfg_email" onclick="setNotifyEmail(this)" class="btswitch btswitch-ios" type="checkbox" {% if data['notify_email']['open'] %}checked{% endif %}>
-						<label class="btswitch-btn ml5" for="cfg_email" style="float: left;margin-top:4px;"></label>
-	                <button ype="button" class="btn btn-default btn-xs panel_api_btn" style="vertical-align: middle; margin-left: 10px" onclick="getEmailCfg();">邮件配置</button>
-					<span class="set-info c7">邮件通知</span>
-				</p>
-
-			</div>
-
-			<!-- <div class="title c6 plr15"><h3 class="f16">VIP</h3></div>
-			<div class="setting-con pd15">
-				<p class="mtb15">
-					<span class="set-tit text-right" title="用户登录" style="float: left;">用户登录</span>
-						<input id="cfg_login" name="cfg_login" onclick="" class="btswitch btswitch-ios" type="checkbox" disabled>
-						<label class="btswitch-btn ml5" for="cfg_login" style="float: left;margin-top:4px;"></label>
-	                <button ype="button" class="btn btn-default btn-xs" style="vertical-align: middle; margin-left: 10px" onclick="setVipInfo();">绑定</button>
-					<span class="set-info c7">【<b style="color:red;">请勿使用</b>】测试版(开发中)</span>
-				</p>
-			</div> -->
-		</div>
-	</div>
+<!-- 页面标题 -->
+<div class="flex justify-between items-center mb-6">
+    <h1 class="text-xl font-semibold text-gray-800">面板设置</h1>
 </div>
+
+<!-- 快捷设置 -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div class="p-5 flex flex-wrap items-center gap-6">
+        <div class="flex items-center gap-3">
+            <span class="text-sm text-gray-600">关闭面板</span>
+            <div class="switch {% if data['admin_close'] == 'yes' %}active{% endif %}" onclick="closePanel()"></div>
+        </div>
+        <div class="flex items-center gap-3 border-l border-gray-200 pl-6">
+            <span class="text-sm text-gray-600">开发模式</span>
+            <div class="switch {% if data['debug'] == 'open' %}active{% endif %}" onclick="debugMode()"></div>
+        </div>
+        <div class="flex items-center gap-3 border-l border-gray-200 pl-6">
+            <span class="text-sm text-gray-600" title="开启后允许使用ipv6访问面板">监听IPv6</span>
+            <div class="switch {{data['ipv6']}}" onclick="setIPv6()"></div>
+        </div>
+    </div>
+</div>
+
+<!-- 基本设置 -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div class="px-5 py-3 border-b border-gray-100">
+        <h3 class="font-medium text-gray-600">基本设置</h3>
+    </div>
+    <div class="p-5">
+        <!-- 提示 -->
+        <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 mt-0.5"></i>
+            <p class="text-sm text-amber-700">为了提高安全，请修改面板密码！</p>
+        </div>
+        
+        <div class="space-y-5">
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">别名</label>
+                <input id="webname" name="webname" class="input w-64" value="{{data['title']}}">
+                <button class="btn btn-primary btn-sm" onclick="saveWebName()">保存</button>
+                <span class="text-xs text-gray-500">面板名称</span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">服务器IP</label>
+                <input name="host_ip" class="input w-64" value="{{data['ip']}}">
+                <button class="btn btn-primary btn-sm" onclick="saveHostIp()">保存</button>
+                <span class="text-xs text-gray-500">默认为外网IP</span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">面板端口</label>
+                <input id="banport" name="port" class="input w-32 text-center" type="number" value="{{data['port']}}" data-port="{{data['port']}}">
+                <button class="btn btn-primary btn-sm" onclick="savePort()">保存</button>
+                <span class="text-xs text-gray-500">建议端口范围 7200 - 65535</span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">安全入口</label>
+                <input id="admin_path" name="admin_path" class="input w-64" value="{{data['admin_path']}}">
+                <button class="btn btn-primary btn-sm" onclick="modifyAuthPath()">设置</button>
+                <span class="text-xs text-gray-500">如: /abc</span>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">默认建站目录</label>
+                <input name="sites_path" class="input w-64" value="{{data['site_path']}}">
+                <button class="btn btn-primary btn-sm" onclick="saveSitesPath()">保存</button>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">默认备份目录</label>
+                <input name="backup_path" class="input w-64" value="{{data['backup_path']}}">
+                <button class="btn btn-primary btn-sm" onclick="saveBackupPath()">保存</button>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">服务器时间</label>
+                <input id="systemdate" name="systemdate" class="input w-64" value="{{data['systemdate']}}" disabled>
+                <button class="btn btn-primary btn-sm" onclick="setTimezone()">设置</button>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">面板用户</label>
+                <input name="username_" class="input w-64" value="{{data['username']}}" disabled>
+                <button class="btn btn-primary btn-sm" onclick="setUserName()">设置</button>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <label class="w-32 text-sm text-gray-600 text-right">面板密码</label>
+                <input name="password_" class="input w-64" value="******" disabled>
+                <button class="btn btn-primary btn-sm" onclick="setPassword()">设置</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 安全设置 -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+    <div class="px-5 py-3 border-b border-gray-100">
+        <h3 class="font-medium text-gray-600">安全设置</h3>
+    </div>
+    <div class="p-5 space-y-5">
+        <div class="flex items-center gap-4">
+            <label class="w-32 text-sm text-gray-600 text-right">绑定域名</label>
+            <input name="bind_domain" class="input w-64" value="{{data['panel_domain']}}">
+            <button class="btn btn-primary btn-sm" onclick="saveBindDomain()">保存</button>
+            <span class="text-xs text-red-500">注意：绑定后只能通过域名访问</span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <label class="w-32 text-sm text-gray-600 text-right">面板SSL</label>
+            <div class="switch {% if data['panel_ssl']['open'] %}active{% endif %}" id="cfg_ssl" onclick="togglePanelSSL()"></div>
+            <button class="btn btn-outline btn-sm" onclick="getPanelSSL()">SSL配置</button>
+            <span class="text-xs text-gray-500">提升面板访问安全性</span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <label class="w-32 text-sm text-gray-600 text-right">BasicAuth认证</label>
+            <div class="switch {% if data['basic_auth']['open'] %}active{% endif %}" id="cfg_basic_auth" onclick="setBasicAuth()"></div>
+            <span class="text-xs text-gray-500">防止面板被扫描</span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <label class="w-32 text-sm text-gray-600 text-right">API接口</label>
+            <div class="switch {% if data['panel_api']['open'] %}active{% endif %}" id="cfg_panel_api" onclick="setPanelApi()"></div>
+            <button class="btn btn-outline btn-sm" onclick="appPage()">APP管理</button>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <label class="w-32 text-sm text-gray-600 text-right">未认证响应</label>
+            <input name="status_code" class="input w-32" value="{{data['unauthorized_status']['text']}}" disabled>
+            <button class="btn btn-primary btn-sm" data-code="{{data['unauthorized_status']['code']}}" onclick="setStatusCode(this)">设置</button>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <label class="w-32 text-sm text-gray-600 text-right">二步验证</label>
+            <div class="switch {% if data['two_step_verification']['open'] %}active{% endif %}" id="cfg_panel_auth" onclick="setAuthSecretApi()"></div>
+            <button class="btn btn-outline btn-sm" onclick="setAuthBind()">绑定设置</button>
+        </div>
+    </div>
+</div>
+
+<!-- 通知设置 -->
+<div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="px-5 py-3 border-b border-gray-100">
+        <h3 class="font-medium text-gray-600">通知设置</h3>
+    </div>
+    <div class="p-5 space-y-5">
+        <div class="flex items-center gap-4">
+            <label class="w-32 text-sm text-gray-600 text-right">TG机器人</label>
+            <div class="switch {% if data['notify_tgbot']['open'] %}active{% endif %}" id="cfg_tgbot" onclick="setNotifyTgbot(this)"></div>
+            <button class="btn btn-outline btn-sm" onclick="getTgbot()">配置</button>
+            <span class="text-xs text-red-500">国内可能无法使用</span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <label class="w-32 text-sm text-gray-600 text-right">邮件通知</label>
+            <div class="switch {% if data['notify_email']['open'] %}active{% endif %}" id="cfg_email" onclick="setNotifyEmail(this)"></div>
+            <button class="btn btn-outline btn-sm" onclick="getEmailCfg()">配置</button>
+        </div>
+    </div>
+</div>
+
 <script src="/static/app/config.js?v={{config.version}}"></script>
 {% endblock %}

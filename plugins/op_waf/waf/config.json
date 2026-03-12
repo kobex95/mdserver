@@ -19,7 +19,8 @@
         "limit": 120,
         "endtime": 300,
         "open": true,
-        "cycle": 60
+        "cycle": 60,
+        "increase": true
     },
     "safe_verify": {
         "status": 200,
@@ -62,6 +63,63 @@
         "open": true,
         "reqfile": "post.html"
     },
-    "area_limit":false,
-    "open": true
+    "area_limit": false,
+    "open": true,
+    "bot_manager": {
+        "status": 200,
+        "ps": "Bot爬虫管理，区分正常爬虫和恶意扫描器",
+        "open": true,
+        "reqfile": "bot_block.html",
+        "block_bad_bots": true,
+        "rate_limit_good_bots": false,
+        "good_bot_limit": 60
+    },
+    "api_limit": {
+        "status": 429,
+        "ps": "API接口速率限制",
+        "open": false,
+        "reqfile": "rate_limit.html",
+        "default_limit": 60,
+        "default_window": 60
+    },
+    "sensitive_data": {
+        "status": 403,
+        "ps": "敏感数据泄露检测",
+        "open": true,
+        "reqfile": "sensitive_block.html",
+        "log_only": false
+    },
+    "advanced_sql_injection": {
+        "status": 403,
+        "ps": "高级SQL注入检测",
+        "open": true,
+        "reqfile": "sql_block.html"
+    },
+    "log4j_rce": {
+        "status": 403,
+        "ps": "Log4j RCE漏洞防护",
+        "open": true,
+        "reqfile": "log4j_block.html"
+    },
+    "ssrf_attack": {
+        "status": 403,
+        "ps": "SSRF服务端请求伪造防护",
+        "open": true,
+        "reqfile": "ssrf_block.html"
+    },
+    "ip_reputation": {
+        "status": 403,
+        "ps": "IP信誉库检测",
+        "open": false,
+        "reqfile": "ip_reputation_block.html",
+        "auto_block": true,
+        "block_duration": 86400
+    },
+    "request_analysis": {
+        "status": 403,
+        "ps": "请求行为分析",
+        "open": false,
+        "detect_anomaly": true,
+        "anomaly_threshold": 0.8
+    }
 }

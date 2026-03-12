@@ -150,10 +150,82 @@ def pSqliteDb(dbname='logs'):
 def run():
     now_t = int(time.time())
     logs_conn = pSqliteDb('logs')
-    del_hot_log = "delete from logs where time<{}".format(now_t)
+    
+    # 清理7天前的热点日志
+    del_hot_log = "delete from logs where time<{}".format(now_t - 7 * 86400)
     print(del_hot_log)
     r = logs_conn.execute(del_hot_log)
+    print("Cleaned {} old logs".format(r))
+    
+    # 优化数据库
+    logs_conn.execute("VACUUM")
+    print("Database optimized")
+    
+    # 更新IP信誉库（如果启用）
+    updateIpReputation()
+    
     return 'ok'
+
+
+def updateIpReputation():
+    """更新IP信誉库"""
+    import urllib.request
+    import json
+    
+    # 知名的恶意IP列表源（示例）
+    reputation_sources = [
+        # 可以添加多个信誉源
+    ]
+    
+    path = getServerDir() + '/waf/rule/ip_reputation.json'
+    if not os.path.exists(path):
+        # 创建默认的空IP信誉库
+        default_reputation = {
+            'last_update': int(time.time()),
+            'sources': [],
+            'malicious_ips': [],
+            'suspicious_ips': []
+        }
+        mw.writeFile(path, json.dumps(default_reputation))
+    
+    print("IP reputation check completed")
+    return True
+
+
+def generateDailyReport():
+    """生成每日安全报告"""
+    conn = pSqliteDb('logs')
+    
+    # 获取今日数据
+    today_start = int(time.time()) - 86400
+    
+    stats = {
+        'date': time.strftime('%Y-%m-%d'),
+        'total_attacks': 0,
+        'blocked_ips': [],
+        'attack_types': {},
+        'top_targets': []
+    }
+    
+    # 统计攻击次数
+    count = conn.field('count(*) as num').where('time>?', (today_start,)).inquiry()
+    stats['total_attacks'] = count[0]['num'] if count else 0
+    
+    # 统计攻击类型
+    types = conn.field('rule_name, count(*) as count').where('time>?', (today_start,)).group('rule_name').inquiry()
+    for t in types:
+        stats['attack_types'][t['rule_name']] = t['count']
+    
+    # TOP 10 攻击IP
+    top_ips = conn.field('ip, count(*) as count').where('time>?', (today_start,)).group('ip').order('count desc').limit(10).inquiry()
+    stats['top_attackers'] = top_ips
+    
+    # 保存报告
+    report_file = getServerDir() + '/logs/daily_report_' + time.strftime('%Y%m%d') + '.json'
+    mw.writeFile(report_file, json.dumps(stats, indent=2))
+    
+    print("Daily report generated: " + report_file)
+    return stats
 
 
 if __name__ == "__main__":

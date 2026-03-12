@@ -1,0 +1,21 @@
+[
+    [1, "(password|passwd|pwd)\s*[=:]\s*['\"][^'\"]{6,}['\"]", "密码泄露检测", 1],
+    [1, "(api[_-]?key|apikey|app[_-]?key|appkey)\s*[=:]\s*['\"][a-zA-Z0-9]{16,}['\"]", "API密钥泄露", 1],
+    [1, "(secret[_-]?key|secretkey)\s*[=:]\s*['\"][a-zA-Z0-9]{16,}['\"]", "密钥泄露", 1],
+    [1, "(access[_-]?token|accesstoken|auth[_-]?token)\s*[=:]\s*['\"][a-zA-Z0-9]{20,}['\"]", "访问令牌泄露", 1],
+    [1, "(private[_-]?key|privatekey)\s*[=:]\s*['\"]-----BEGIN", "私钥泄露", 1],
+    [1, "(credit[_-]?card|creditcard|card[_-]?number)\s*[=:]\s*['\"][0-9]{13,19}['\"]", "信用卡号泄露", 1],
+    [1, "(bank[_-]?account|account[_-]?number)\s*[=:]\s*['\"][0-9]{10,}['\"]", "银行账号泄露", 1],
+    [1, "(id[_-]?card|idcard|identity)\s*[=:]\s*['\"][0-9]{15,18}['\"]", "身份证号泄露", 1],
+    [1, "(mobile|phone|tel)\s*[=:]\s*['\"]1[3-9][0-9]{9}['\"]", "手机号泄露", 1],
+    [1, "(email|mail)\s*[=:]\s*['\"][a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}['\"]", "邮箱泄露", 0],
+    [1, "(aws[_-]?access[_-]?key[_-]?id|AKIA[0-9A-Z]{16})", "AWS密钥泄露", 1],
+    [1, "(AKIA|ASIA|AROA)[0-9A-Z]{16}", "AWS凭证泄露", 1],
+    [1, "(gh[pousr]_[A-Za-z0-9_]{36}|github[_-]?token)", "GitHub Token泄露", 1],
+    [1, "(sk-[a-zA-Z0-9]{48})", "OpenAI API密钥泄露", 1],
+    [1, "(sk_live_[0-9a-zA-Z]{24,34})", "Stripe密钥泄露", 1],
+    [1, "(sq0csp-[0-9A-Za-z\-_]{43})", "Square密钥泄露", 1],
+    [1, "(SG\.[a-zA-Z0-9_-]{22}\.[a-zA-Z0-9_-]{43})", "SendGrid密钥泄露", 1],
+    [1, "(xox[baprs]-[0-9]{10,13}-[0-9]{10,13}[a-zA-Z0-9-]*)", "Slack Token泄露", 1],
+    [1, "(AKIA|ASIA)[0-9A-Z]{16}", "AWS Access Key泄露", 1]
+]

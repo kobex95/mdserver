@@ -1,0 +1,21 @@
+[
+    [1, "(Googlebot|Googlebot-Mobile|Googlebot-Image|Mediapartners-Google|AdsBot-Google)", "Google爬虫", 0],
+    [1, "(Baiduspider|Baiduspider-image|Baiduspider-video|Baiduspider-news|Baiduspider-favo)", "百度爬虫", 0],
+    [1, "(bingbot|BingPreview|msnbot|MSNBot|msnbot-media|adidxbot)", "Bing爬虫", 0],
+    [1, "(360Spider|HaosouSpider|360spider-image|360spider-video)", "360爬虫", 0],
+    [1, "(Sogou web spider|Sogou inst spider|Sogou Pic Spider|Sogou headhunt|sogouspider)", "搜狗爬虫", 0],
+    [1, "(YisouSpider|YisouSpider-OB|YisouSpider-AL)", "神马爬虫", 0],
+    [1, "(Bytespider|bytespider)", "字节爬虫", 0],
+    [1, "(Slurp|Yahoo! Slurp)", "Yahoo爬虫", 0],
+    [1, "(DuckDuckBot|DuckDuckGo)", "DuckDuckGo爬虫", 0],
+    [1, "(facebookexternalhit|Facebot)", "Facebook爬虫", 0],
+    [1, "(Twitterbot)", "Twitter爬虫", 0],
+    [1, "(LinkedInBot)", "LinkedIn爬虫", 0],
+    [1, "(SemrushBot|AhrefsBot|MJ12bot|DotBot|Rogerbot|Screaming Frog SEO Spider|BLEXBot)", "SEO爬虫工具", 0],
+    [1, "(curl|wget|python-requests|python-urllib|libwww-perl|Java|Go-http-client|axios|PostmanRuntime|HTTPie)", "命令行工具", 0],
+    [1, "(ZmEu|sqlmap|nikto|masscan|zgrab|nmap|w3af|arachni|acunetix|netsparker|dirbuster|gobuster|wfuzz)", "渗透测试工具", 1],
+    [1, "(Morfeus Fucking Scanner|masscan|zgrab|censys|shodan|Project 25499)", "恶意扫描器", 1],
+    [1, "(MJ12bot|AhrefsBot|SemrushBot|DotBot|BLEXBot|Rogerbot|SeznamBot|CCBot|YandexBot|Exabot)", "海外爬虫", 0],
+    [1, "(GPTBot|ChatGPT-User|Claude-Web|anthropic-ai|PerplexityBot|PerplexityCrawler)", "AI爬虫", 0],
+    [0, "(Google-Extended|FacebookBot|Amazonbot|Applebot|Twitterbot)", "国外平台爬虫", 0]
+]

@@ -1,0 +1,18 @@
+[
+    [1, "(\$\{jndi:(ldap|ldaps|dns|rmi|iiop|corba|nis|nds):\/\/[^}]+\})", "Log4j JNDI注入", 1],
+    [1, "(\$\{env:[^}]+\})", "Log4j环境变量读取", 1],
+    [1, "(\$\{sys:[^}]+\})", "Log4j系统属性读取", 1],
+    [1, "(\$\{java:[^}]+\})", "Log4j Java属性读取", 1],
+    [1, "(\$\{lower:[^}]+\})", "Log4j Lower函数", 1],
+    [1, "(\$\{upper:[^}]+\})", "Log4j Upper函数", 1],
+    [1, "(\$\{::-[^}]+\})", "Log4j 绕过技巧", 1],
+    [1, "(\$\{[^}]*\$\{[^}]*\}[^}]*\})", "Log4j 嵌套注入", 1],
+    [1, "(\$\{base64:[^}]+\})", "Log4j Base64编码", 1],
+    [1, "(\$\{[^}]*jndi[^}]*\})", "Log4j JNDI关键字", 1],
+    [1, "(\$\{[^}]*ldap[^}]*\})", "Log4j LDAP关键字", 1],
+    [1, "(\$\{[^}]*rmi[^}]*\})", "Log4j RMI关键字", 1],
+    [1, "(X-Api-Version:\s*\$\{jndi:)", "Log4j请求头注入", 1],
+    [1, "(User-Agent:\s*\$\{jndi:)", "Log4j UA头注入", 1],
+    [1, "(Referer:\s*\$\{jndi:)", "Log4j Referer注入", 1],
+    [1, "(X-Forwarded-For:\s*\$\{jndi:)", "Log4j XFF头注入", 1]
+]

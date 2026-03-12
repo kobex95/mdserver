@@ -307,7 +307,9 @@ def autoCpHtml(file):
 def autoMakeLuaConf(conf_reload=False, cp_reload=False):
     conf_list = ['args', 'cookie', 'ip_black', 'ip_white',
                  'ipv6_black', 'post', 'scan_black', 'url',
-                 'url_white', 'user_agent']
+                 'url_white', 'user_agent', 'bot_manager',
+                 'api_limit', 'sensitive_data', 'advanced_sql_injection',
+                 'log4j_rce', 'ssrf_attack']
     for x in conf_list:
         autoMakeLuaConfSingle(x, conf_reload)
 
@@ -1484,6 +1486,150 @@ def testRun():
     return mw.returnJson(True, '测试运行成功!', returnData)
 
 
+def getSecurityStats():
+    """获取安全统计信息"""
+    conn = pSqliteDb('logs')
+    
+    # 总拦截次数
+    total_blocked = conn.field('count(*) as num').inquiry()
+    total_blocked = total_blocked[0]['num'] if total_blocked else 0
+    
+    # 今日拦截
+    today_start = int(time.time()) - 86400
+    today_blocked = conn.field('count(*) as num').where('time>?', (today_start,)).inquiry()
+    today_blocked = today_blocked[0]['num'] if today_blocked else 0
+    
+    # 攻击类型统计
+    attack_types = conn.field('rule_name, count(*) as count').group('rule_name').order('count desc').limit(10).inquiry()
+    
+    # TOP 攻击IP
+    top_ips = conn.field('ip, count(*) as count').group('ip').order('count desc').limit(10).inquiry()
+    
+    # TOP 被攻击站点
+    top_sites = conn.field('domain, count(*) as count').group('domain').order('count desc').limit(10).inquiry()
+    
+    data = {
+        'total_blocked': total_blocked,
+        'today_blocked': today_blocked,
+        'attack_types': attack_types,
+        'top_ips': top_ips,
+        'top_sites': top_sites
+    }
+    return mw.returnJson(True, 'ok', data)
+
+
+def getBotStats():
+    """获取Bot统计信息"""
+    path = getRuleJsonPath('bot_manager')
+    content = mw.readFile(path)
+    rules = json.loads(content)
+    
+    good_bots = []
+    bad_bots = []
+    
+    for rule in rules:
+        bot_info = {
+            'name': rule[2],
+            'pattern': rule[1],
+            'is_blocked': rule[3] == 1,
+            'is_active': rule[0] == 1
+        }
+        if rule[3] == 1:
+            bad_bots.append(bot_info)
+        else:
+            good_bots.append(bot_info)
+    
+    data = {
+        'good_bots': good_bots,
+        'bad_bots': bad_bots,
+        'good_bot_count': len(good_bots),
+        'bad_bot_count': len(bad_bots)
+    }
+    return mw.returnJson(True, 'ok', data)
+
+
+def setBotBlock():
+    """设置Bot拦截状态"""
+    args = getArgs()
+    data = checkArgs(args, ['bot_name', 'is_block'])
+    if not data[0]:
+        return data[1]
+    
+    bot_name = args['bot_name']
+    is_block = args['is_block'] == '1'
+    
+    path = getRuleJsonPath('bot_manager')
+    content = mw.readFile(path)
+    rules = json.loads(content)
+    
+    for rule in rules:
+        if rule[2] == bot_name:
+            rule[3] = 1 if is_block else 0
+            break
+    
+    mw.writeFile(path, json.dumps(rules))
+    setConfRestartWeb()
+    return mw.returnJson(True, '设置成功!')
+
+
+def getAttackTrend():
+    """获取攻击趋势数据"""
+    args = getArgs()
+    days = int(args.get('days', 7))
+    
+    conn = pSqliteDb('logs')
+    now = int(time.time())
+    trend_data = []
+    
+    for i in range(days):
+        day_start = now - (i + 1) * 86400
+        day_end = now - i * 86400
+        count = conn.field('count(*) as num').where('time>? AND time<?', (day_start, day_end)).inquiry()
+        count = count[0]['num'] if count else 0
+        
+        trend_data.append({
+            'date': time.strftime('%Y-%m-%d', time.localtime(day_end)),
+            'count': count
+        })
+    
+    return mw.returnJson(True, 'ok', list(reversed(trend_data)))
+
+
+def exportLogs():
+    """导出日志"""
+    args = getArgs()
+    data = checkArgs(args, ['start_date', 'end_date'])
+    if not data[0]:
+        return data[1]
+    
+    start_date = args['start_date']
+    end_date = args['end_date']
+    
+    start_time = int(time.mktime(time.strptime(start_date, '%Y-%m-%d')))
+    end_time = int(time.mktime(time.strptime(end_date, '%Y-%m-%d'))) + 86400
+    
+    conn = pSqliteDb('logs')
+    logs = conn.field('*').where('time>=? AND time<?', (start_time, end_time)).order('time desc').inquiry()
+    
+    export_file = getServerDir() + '/logs/export_' + start_date + '_to_' + end_date + '.json'
+    mw.writeFile(export_file, json.dumps(logs))
+    
+    return mw.returnJson(True, '导出成功', {'file': export_file})
+
+
+def clearLogs():
+    """清理日志"""
+    args = getArgs()
+    days = int(args.get('days', 30))
+    
+    conn = pSqliteDb('logs')
+    clear_time = int(time.time()) - days * 86400
+    
+    result = conn.execute('DELETE FROM logs WHERE time<?', (clear_time,))
+    
+    return mw.returnJson(True, '已清理 ' + str(result) + ' 条旧日志')
+
+
 def installPreInspection():
     check_op = mw.getServerDir() + "/openresty"
     if not os.path.exists(check_op):
@@ -1589,5 +1735,17 @@ if __name__ == "__main__":
         print(cleanDropIp())
     elif func == 'test_run':
         print(testRun())
+    elif func == 'get_security_stats':
+        print(getSecurityStats())
+    elif func == 'get_bot_stats':
+        print(getBotStats())
+    elif func == 'set_bot_block':
+        print(setBotBlock())
+    elif func == 'get_attack_trend':
+        print(getAttackTrend())
+    elif func == 'export_logs':
+        print(exportLogs())
+    elif func == 'clear_logs':
+        print(clearLogs())
     else:
         print('error')
