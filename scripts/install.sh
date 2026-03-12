@@ -51,7 +51,7 @@ select_proxy() {
     echo -e "${BLUE}正在检测网络环境...${PLAIN}"
     
     if [[ "$NETWORK_TYPE" == "global" ]]; then
-        HTTP_PREFIX="https://"
+        HTTP_PREFIX=""
         echo -e "${SUCCESS} 使用直连访问GitHub"
         return 0
     fi
