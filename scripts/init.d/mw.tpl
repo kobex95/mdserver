@@ -391,20 +391,6 @@ mw_update()
     bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/master/scripts/update.sh")
 }
 
-mw_update_dev()
-{
-    if [ -f ${PANEL_DIR}/task.py ];then
-        echo "与后续版本差异太大,不再提供更新"
-        exit 0
-    fi
-
-    mw_common_proxy
-    echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")"
-    bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")
-    
-    cd ${PANEL_DIR}
-}
-
 mw_update_venv()
 {
     rm -rf ${PANEL_DIR}/bin
@@ -412,8 +398,8 @@ mw_update_venv()
     rm -rf ${PANEL_DIR}/lib
 
     mw_common_proxy
-    echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")"
-    bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh")
+    echo "bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/kobex95/mdserver/master/scripts/update.sh")"
+    bash <(curl -fsSL "${HTTP_PREFIX}raw.githubusercontent.com/kobex95/mdserver/master/scripts/update.sh")
     
     cd ${PANEL_DIR}
 }
@@ -665,9 +651,8 @@ mw_list(){
     echo -e "mw redis        - 连接Redis"
     echo -e "mw valkey       - 连接WalKey"
     echo -e "mw install      - 执行安装脚本"
-    echo -e "mw update       - 更新到正式环境最新代码"
-    echo -e "mw update_dev   - 更新到测试环境最新代码"
-    echo -e "mw debug        - 调式开发面板"
+    echo -e "mw update       - 更新到最新代码"
+    echo -e "mw debug        - 调试开发面板"
     echo -e "mw list         - 显示命令列表"
 }
 
@@ -757,8 +742,6 @@ case "$1" in
     'open') mw_open;;
     'install') mw_install;;
     'update') mw_update;;
-    'dev') mw_update_dev;;
-    'update_dev') mw_update_dev;;
     'install_app') mw_install_app;;
     'close_admin_path') mw_close_admin_path;;
     'unbind_domain') mw_unbind_domain;;

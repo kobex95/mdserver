@@ -145,36 +145,19 @@ wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/mi
 - 需已经安装mdserver-web
 
 ```
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/app.sh)
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/quick/app.sh)
 ```
 
 
-### DEV使用
+### 安装/更新
 
 ```
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install.sh)
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update.sh)
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/install.sh)
+bash <(curl --insecure -fsSL https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/update.sh)
 
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install_dev.sh)
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/update_dev.sh)
+wget --no-check-certificate -O install.sh https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/install.sh && bash install.sh
 
-wget --no-check-certificate -O install.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/install.sh && bash install.sh
-
-wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/uninstall.sh && bash uninstall.sh
-
-bash <(curl --insecure -fsSL https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/quick/debug.sh)
-
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install.sh)
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update.sh)
-
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/install_dev.sh)
-bash <(curl --insecure -fsSL https://code.midoks.icu/midoks/mdserver-web/raw/branch/dev/scripts/update_dev.sh)
-```
-
-### 旧版安装/更新
-```
-curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/install.sh | bash
-curl --insecure -fsSL  https://raw.githubusercontent.com/midoks/mdserver-web/dev/scripts/old/update.sh | bash
+wget --no-check-certificate -O uninstall.sh https://raw.githubusercontent.com/kobex95/mdserver/master/scripts/uninstall.sh && bash uninstall.sh
 ```
 
 ### 偶然问题
@@ -185,7 +168,7 @@ cd /www/server/mdserver-web && rm -rf lib64
 cd /www/server/mdserver-web && rm -rf bin
 cd /www/server/mdserver-web && rm -rf include
 
-mw update/mw update_dev/mw dev
+mw update/mw update
 ```
 
 ### 授权许可

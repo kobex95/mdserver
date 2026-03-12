@@ -22,8 +22,7 @@ mw debug			| 开发测试
 mw venv				| 进入虚拟环境
 mw mirror			| 切换镜像
 mw install_app			| 快捷安装常用软件
-mw update 			| 更新到正式
-mw dev/update_dev		| 更新到开发
+mw update 			| 更新面板
 
 service mw [start|stop|reload|restart|status]
 ```
