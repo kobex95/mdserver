@@ -227,7 +227,7 @@ if [ $OSNAME != "macos" ];then
 	mkdir -p /www/backup/site
 
 	if [ ! -d /www/server/mdserver-web ];then
-		curl --insecure -sSLo /tmp/master.tar.gz ${HTTP_PREFIX}github.com/midoks/mdserver-web/archive/refs/heads/master.tar.gz
+		curl --insecure -sSLo /tmp/master.tar.gz ${HTTP_PREFIX}github.com/kobex95/mdserver/archive/refs/heads/master.tar.gz
 		cd /tmp && tar -zxvf /tmp/master.tar.gz
 		mv -f /tmp/mdserver-web-master /www/server/mdserver-web
 		rm -rf /tmp/master.tar.gz
@@ -249,7 +249,7 @@ fi
 
 echo "use system version: ${OSNAME}"
 if [ "${OSNAME}" == "macos" ];then
-	curl --insecure -fsSL ${HTTP_PREFIX}raw.githubusercontent.com/midoks/mdserver-web/refs/heads/dev/scripts/install/macos.sh | bash
+	curl --insecure -fsSL ${HTTP_PREFIX}raw.githubusercontent.com/kobex95/mdserver/refs/heads/dev/scripts/install/macos.sh | bash
 else
 	cd /www/server/mdserver-web && bash scripts/install/${OSNAME}.sh
 fi
