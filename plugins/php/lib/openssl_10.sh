@@ -27,7 +27,7 @@ if [ ! -d ${SERVER_ROOT}/openssl10 ];then
 
     if [ "$LOCAL_ADDR" == 'cn' ];then
         if [ ! -f ${SOURCE_ROOT}/openssl-${opensslVersion}.tar.gz ];then
-            wget --no-check-certificate -O openssl-${opensslVersion}.tar.gz https://dl.midoks.icu/lib/openssl-${opensslVersion}.tar.gz -T 20
+            wget --no-check-certificate -O openssl-${opensslVersion}.tar.gz https://github.com/openssl/openssl/releases/download/OpenSSL_1_0_2q/openssl-${opensslVersion}.tar.gz -T 60
         fi 
     fi
 
