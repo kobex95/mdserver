@@ -74,6 +74,36 @@ select_proxy() {
     echo -e "${YELLOW}警告: 代理测试失败，将尝试使用默认代理${PLAIN}"
 }
 
+# 安装基础依赖
+install_base_deps() {
+    if [[ -f /etc/os-release ]]; then
+        local id
+        id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+        case "$id" in
+            debian|ubuntu)
+                apt update && apt install -y wget curl zip unzip tar cron python3 python3-venv python3-pip
+                ;;
+            centos|rhel|rocky|almalinux|anolis|fedora)
+                yum install -y wget curl zip unzip tar crontabs python3 python3-pip
+                ;;
+            alpine)
+                apk update && apk add wget curl zip unzip tar python3 py3-pip
+                ;;
+            opensuse*)
+                zypper refresh && zypper install -y cron wget curl zip unzip python3 python3-pip
+                ;;
+            amzn)
+                yum install -y wget curl zip unzip tar crontabs python3 python3-pip
+                ;;
+            euler|openeuler)
+                yum install -y wget curl zip unzip tar crontabs python3 python3-pip
+                ;;
+        esac
+    elif [[ -f /etc/freebsd-version ]]; then
+        pkg install -y wget curl zip unzip python3 py38-pip
+    fi
+}
+
 # 检测操作系统
 detect_os() {
     local os_name="unknow"
@@ -84,44 +114,17 @@ detect_os() {
         local id
         id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
         case "$id" in
-            debian)
-                os_name="debian"
-                apt install -y wget curl zip unzip tar cron
-                ;;
-            ubuntu)
-                os_name="ubuntu"
-                apt install -y wget curl zip unzip tar cron
-                ;;
-            centos|rhel|rocky|almalinux|anolis)
-                os_name="rhel"
-                yum install -y wget curl zip unzip tar crontabs
-                ;;
-            fedora)
-                os_name="rhel"
-                yum install -y wget curl zip unzip tar crontabs
-                ;;
-            alpine)
-                os_name="alpine"
-                apk update
-                apk add wget curl zip unzip tar
-                ;;
-            opensuse*)
-                os_name="opensuse"
-                zypper refresh
-                zypper install -y cron wget curl zip unzip
-                ;;
-            amzn)
-                os_name="amazon"
-                yum install -y wget curl zip unzip tar crontabs
-                ;;
-            euler|openeuler)
-                os_name="euler"
-                yum install -y wget curl zip unzip tar crontabs
-                ;;
+            debian) os_name="debian" ;;
+            ubuntu) os_name="ubuntu" ;;
+            centos|rhel|rocky|almalinux|anolis) os_name="rhel" ;;
+            fedora) os_name="rhel" ;;
+            alpine) os_name="alpine" ;;
+            opensuse*) os_name="opensuse" ;;
+            amzn) os_name="amazon" ;;
+            euler|openeuler) os_name="euler" ;;
         esac
     elif [[ -f /etc/freebsd-version ]]; then
         os_name="freebsd"
-        pkg install -y wget curl zip unzip
     fi
     
     echo "$os_name"
@@ -311,6 +314,10 @@ main() {
         curl --insecure -fsSL "${HTTP_PREFIX}https://${RAW_HOST}/master/scripts/install/macos.sh" | bash
         exit 0
     fi
+    
+    # 安装基础依赖(Python3等)
+    echo -e "${BLUE}正在安装基础依赖...${PLAIN}"
+    install_base_deps
     
     # 创建用户和目录
     create_user
