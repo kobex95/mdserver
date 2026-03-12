@@ -52,7 +52,7 @@ select_proxy() {
     
     if [[ "$NETWORK_TYPE" == "global" ]]; then
         HTTP_PREFIX=""
-        echo -e "${SUCCESS} 使用直连访问GitHub"
+        echo -e "${SUCCESS} 使用直连访问GitHub(无代理)"
         return 0
     fi
     
