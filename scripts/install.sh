@@ -81,30 +81,40 @@ install_base_deps() {
         id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
         case "$id" in
             debian|ubuntu)
-                apt update && apt install -y wget curl zip unzip tar cron python3 python3-venv python3-pip
+                apt-get update > /dev/null 2>&1
+                apt-get install -y wget curl zip unzip tar cron python3 python3-venv python3-pip > /dev/null 2>&1
                 ;;
             centos|rhel|rocky|almalinux|anolis|fedora)
-                yum install -y wget curl zip unzip tar crontabs python3 python3-pip
+                yum install -y wget curl zip unzip tar crontabs python3 python3-pip > /dev/null 2>&1
                 ;;
             alpine)
-                apk update && apk add wget curl zip unzip tar python3 py3-pip
+                apk update > /dev/null 2>&1
+                apk add wget curl zip unzip tar python3 py3-pip > /dev/null 2>&1
                 ;;
             opensuse*)
-                zypper refresh && zypper install -y cron wget curl zip unzip python3 python3-pip
+                zypper refresh > /dev/null 2>&1
+                zypper install -y cron wget curl zip unzip python3 python3-pip > /dev/null 2>&1
                 ;;
             amzn)
-                yum install -y wget curl zip unzip tar crontabs python3 python3-pip
+                yum install -y wget curl zip unzip tar crontabs python3 python3-pip > /dev/null 2>&1
                 ;;
             euler|openeuler)
-                yum install -y wget curl zip unzip tar crontabs python3 python3-pip
+                yum install -y wget curl zip unzip tar crontabs python3 python3-pip > /dev/null 2>&1
                 ;;
         esac
     elif [[ -f /etc/freebsd-version ]]; then
-        pkg install -y wget curl zip unzip python3 py38-pip
+        pkg install -y wget curl zip unzip python3 py38-pip > /dev/null 2>&1
     fi
+    
+    # 验证Python3安装
+    if ! command -v python3 &> /dev/null; then
+        echo -e "${ERROR} Python3 安装失败，请手动安装后重试"
+        exit 1
+    fi
+    echo -e "${SUCCESS} Python3 安装完成: $(python3 --version)"
 }
 
-# 检测操作系统
+# 检测操作系统(只检测，不安装)
 detect_os() {
     local os_name="unknow"
     
@@ -112,7 +122,7 @@ detect_os() {
         os_name="macos"
     elif [[ -f /etc/os-release ]]; then
         local id
-        id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+        id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"' 2>/dev/null)
         case "$id" in
             debian) os_name="debian" ;;
             ubuntu) os_name="ubuntu" ;;
