@@ -238,6 +238,19 @@ install_acme() {
 install_libs() {
     echo -e "${BLUE}正在安装依赖库...${PLAIN}"
     cd /www/server/mdserver-web
+    
+    # 调试信息
+    echo "当前目录: $(pwd)"
+    echo "目录内容:"
+    ls -la
+    
+    if [ ! -f "scripts/lib.sh" ]; then
+        echo -e "${ERROR} scripts/lib.sh 不存在，尝试重新下载..."
+        # 手动下载 lib.sh
+        curl -fsSL -o scripts/lib.sh "https://${RAW_HOST}/master/scripts/lib.sh" || \
+        wget --no-check-certificate -O scripts/lib.sh "https://${RAW_HOST}/master/scripts/lib.sh"
+    fi
+    
     bash scripts/lib.sh
 }
 
