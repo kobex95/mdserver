@@ -1,217 +1,257 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+
+<!doctype html>
+<html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>{{data['title']}}</title>
-    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-        }
-        
-        .input-field {
-            transition: all 0.3s ease;
-        }
-        
-        .input-field:focus {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-        }
-        
-        .login-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            transition: all 0.3s ease;
-        }
-        
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .login-btn:active {
-            transform: translateY(0);
-        }
-        
-        @media (max-width: 640px) {
-            .login-card {
-                margin: 20px;
-                max-width: calc(100% - 40px);
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="icon" href="/static/favicon.ico" type="image/x-icon" />
+<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
+<title>{{data['title']}}</title>
+<link rel="stylesheet" type="text/css" href="/static/layer/skin/default/layer.css?v={{config.version}}">
+<link rel="stylesheet" type="text/css" href="/static/css/site.css?v={{config.version}}">
+<link rel="stylesheet" type="text/css" href="/static/css/login.css?v={{config.version}}">
+<style type="text/css">
+@media screen and (max-width: 640px) {
+    .scanCode{
+    	display: none;
+    }
+    .account{
+    	display: block !important;
+    }
+    .bg_img{
+    	display: none;
+    }
+}
+
+.bg_img.pc{
+	background-position: 0 -60px;
+}
+.bg_img.pc:hover{
+	background-position: -60px -60px;
+}
+
+.qrCode{
+	text-align: center;
+	padding-top: 20px;
+}
+.scanCode .titles{
+	font-size: 23px;
+	margin-top: 25px;
+	color: #444;
+	text-align: center;
+}
+.list_scan{
+	width: 150px;
+	margin: 0 auto; 
+	margin-top: 15px;
+}
+.list_scan>img{
+	width: 40px;
+	height: 40px;
+	float: left;
+	margin-right: 15px;
+}
+.list_scan span{
+	display: inline-block;
+	font-size: 13px;
+	margin-bottom: 5px;
+}
+.list_scan a:hover .weChatSamll{
+	display: block;
+}
+.list_scan .weChatSamll{
+	display: none;
+	width: 150px;
+	height: 150px;
+	position: absolute;
+	border: 1px solid #ececec;
+	border-radius: 5px;
+	bottom: 105px;
+	right: 80px;
+	padding: 20px;
+	background-color: #fff;
+}
+
+.list_scan .weChatSamll img{
+	width: 100%;
+}
+
+.list_scan .weChatSamll em{
+	position: absolute;
+	border: 7px solid #ececec;
+	border-color: #ececec transparent transparent transparent;
+	width: 0;
+	height: 0;
+	right: 87px;
+	bottom: -14px;
+	margin-left: -6px;
+}
+
+.tips{
+	width: 115px;
+	position: absolute;
+	top: 10px;
+	right: 65px;
+	color: rgb(32, 165, 58);
+	background: #dff0d8;
+	padding: 5px 10px;
+	text-align: center;
+	border-radius: 4px;
+}
+
+.tips em{
+	position: absolute;
+	border: 6px solid #dff0d8;
+	border-color:transparent  transparent transparent #dff0d8; 
+	width: 0;
+	height: 0;
+	right: -11px;
+	top: 8px;
+	margin-left: -6px;
+}
+
+.tips img{
+	height: 16px;
+	width: 16px;
+	vertical-align: middle;
+	margin-top: -1px;
+	margin-right: 4px;
+}
+.main .login .rlogo{
+	margin-top: 15px;
+	margin-bottom: 25px;
+}
+
+.layui-layer .layui-layer-btn{
+	width: 235px;
+}
+</style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
-    <div class="login-card rounded-2xl shadow-2xl w-full max-w-md p-8">
-        <!-- Logo -->
-        <div class="text-center mb-8">
-            <div class="w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg">
-                <i class="fa-solid fa-server text-white text-2xl"></i>
-            </div>
-            <h1 class="text-2xl font-bold text-gray-800">{{data['title']}}</h1>
-            <p class="text-gray-500 text-sm mt-2">服务器管理面板</p>
-        </div>
-        
-        <!-- 登录表单 -->
-        <form id="login-form" class="space-y-5">
-            <!-- 用户名 -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="fa-solid fa-user mr-2 text-gray-400"></i>账户
-                </label>
-                <input type="text" name="username" 
-                    class="input-field w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-                    placeholder="请输入用户名" autocomplete="username">
-            </div>
-            
-            <!-- 密码 -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="fa-solid fa-lock mr-2 text-gray-400"></i>密码
-                </label>
-                <input type="password" name="password" 
-                    class="input-field w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-                    placeholder="请输入密码" autocomplete="current-password">
-            </div>
-            
-            <!-- 验证码 -->
-            <div id="code-section" class="{% if not session['code'] %}hidden{% endif %}">
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <i class="fa-solid fa-shield-halved mr-2 text-gray-400"></i>验证码
-                </label>
-                <div class="flex gap-3">
-                    <input type="text" name="code" 
-                        class="input-field flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
-                        placeholder="请输入验证码">
-                    {% if session['code'] %}
-                    <img id="code-img" src="/code" 
-                        class="h-12 rounded-lg cursor-pointer hover:opacity-80 transition-opacity border border-gray-200"
-                        onclick="this.src='/code?'+new Date().getTime()" title="点击刷新验证码">
-                    {% endif %}
-                </div>
-            </div>
-            
-            <!-- 错误提示 -->
-            <div id="error-msg" class="text-red-500 text-sm text-center hidden"></div>
-            
-            <!-- 登录按钮 -->
-            <button type="submit" id="login-btn" 
-                class="login-btn w-full py-3 text-white font-medium rounded-xl shadow-lg">
-                <i class="fa-solid fa-right-to-bracket mr-2"></i>登 录
-            </button>
-        </form>
-        
-        <!-- 底部链接 -->
-        <div class="mt-6 text-center">
-            <a href="https://github.com/midoks/mdserver-web/wiki/%E5%AF%86%E7%A0%81%E4%BF%AE%E6%94%B9" 
-                target="_blank" 
-                class="text-sm text-gray-500 hover:text-indigo-600 transition-colors">
-                <i class="fa-solid fa-key mr-1"></i>忘记密码?
-            </a>
-        </div>
-        
-        <!-- 版本信息 -->
-        <div class="mt-8 pt-6 border-t border-gray-100 text-center">
-            <span class="text-xs text-gray-400">Powered by mdserver-web</span>
-        </div>
-    </div>
-    
-    <script src="/static/js/jquery-1.10.2.min.js"></script>
-    <script src="/static/layer/layer.js"></script>
-    <script>
-    $(function() {
-        $('#login-form').on('submit', function(e) {
-            e.preventDefault();
-            
-            var username = $('input[name="username"]').val();
-            var password = $('input[name="password"]').val();
-            var code = $('input[name="code"]').val();
-            
-            if (!username || !password) {
-                layer.msg('请填写账户和密码', {icon: 2});
-                return;
-            }
-            
-            var loadT = layer.msg('正在登录中...', {icon: 16, time: 0, shade: [0.3, '#000']});
-            
-            $.ajax({
-                url: '/do_login',
-                type: 'POST',
-                data: {
-                    username: username,
-                    password: password,
-                    code: code
-                },
-                dataType: 'json',
-                success: function(rdata) {
-                    layer.close(loadT);
-                    
-                    if (!rdata.status || rdata.status < 0) {
-                        var errorMsg = rdata.msg;
-                        if (username === 'admin' && errorMsg.indexOf('用户名') !== -1) {
-                            errorMsg += '<br><small class="text-gray-500">提示: 使用命令 <code class="bg-gray-100 px-1 rounded">mw default</code> 获取默认账户密码</small>';
-                        }
-                        
-                        $('#error-msg').html(errorMsg).removeClass('hidden');
-                        $('input[name="password"]').val('');
-                        
-                        // 显示验证码
-                        var num = rdata.msg.match(/\[(\d+)\]/);
-                        if (num && parseInt(num[1]) < 5) {
-                            $('#code-section').removeClass('hidden');
-                            $('#code-img').attr('src', '/code?' + new Date().getTime());
-                        }
-                        
-                        layer.msg(rdata.msg, {icon: 2, time: 5000});
-                        return;
-                    }
-                    
-                    // 二步验证
-                    if (rdata.status === 2) {
-                        layer.prompt({
-                            formType: 3,
-                            value: '',
-                            title: '二步验证',
-                        }, function(value, index) {
-                            $.post('/verify_login', {
-                                auth: value,
-                                username: username,
-                                password: password
-                            }, function(vdata) {
-                                if (vdata.status < 0) {
-                                    layer.msg(vdata.msg, {icon: 2, time: 5000});
-                                    return;
-                                }
-                                layer.close(index);
-                                window.location.href = '/';
-                            }, 'json');
-                        });
-                        return;
-                    }
-                    
-                    layer.msg('登录成功', {icon: 1});
-                    setTimeout(function() {
-                        window.location.href = '/';
-                    }, 500);
-                },
-                error: function() {
-                    layer.close(loadT);
-                    layer.msg('网络错误，请重试', {icon: 2});
-                }
-            });
-        });
-    });
-    </script>
+<body>
+<div class="main">
+	<div class="login">
+		<div class="account">
+			<form class="loginform" method="post" action="/login" onsubmit="return false;">
+			<div class="rlogo">{{data['title']}}</div>
+			<div class="line">
+				<input class="inputtxt" value="" name="username" datatype="*" nullmsg="请填写账户" errormsg="请填写账户" placeholder="账户" type="text" autocomplete="on">
+				<div class="Validform_checktip"></div>
+			</div>
+			<div class="line"><input class="inputtxt" name="password" value="" datatype="*" nullmsg="请填写密码" errormsg="请填写密码" placeholder="密码" type="password">
+				<div class="Validform_checktip"></div>
+			</div>
+			<div style="color: red;position: relative;top: -14px;" id="error"></div>
+			<div class="line yzm" style="top: -5px;{% if not session['code'] %}display:none;{% endif %}">
+				<input type="text" class="inputtxt" name="code" nullmsg="请填写4位验证码" errormsg="验证码" datatype="*" placeholder="验证码">
+				<div class="Validform_checktip"></div>
+				<div id='mw_yzm'>{% if session['code'] %}<img width="100" height="40" class="passcode" onclick="this.src=this.src.split('?')[0] + '?'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;" title="" >{% endif %}</div>
+			</div>
+			<div class="login_btn"><input id="login-button" value="登录" type="submit"></div>
+			<p class="pwinfo" style="display:none"></p>
+			<a class="resetpw" href="//github.com/kobex95/mdserver/wiki" target="_blank">忘记密码</a>
+			</form>
+		</div>
+
+	</div>
+</div>
+<script type="text/javascript" src="/static/js/jquery-1.10.2.min.js?v={{config.version}}"></script>
+<script src="/static/language/zh-cn.js?v={{config.version}}"></script>
+<script src="/static/language/Simplified_Chinese/lan.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/layer/layer.js?v={{config.version}}"></script>
+<script type="text/javascript" src="/static/js/Validform_v5.3.2_min.js?v={{config.version}}"></script>
+<script type="text/javascript">
+$(function(){
+	wreset();
+})
+
+window.onresize=function(){
+	wreset();
+}
+
+function wreset(){
+	var w = $(window).width();
+	var yzmw = $(".login .line").width() - 140;
+	if($(".yzm").is(":visible") && w > 640){
+		$(".login").css({"height":"365px","margin-top":"-230px"});
+	} else {
+		$(".login").removeAttr("style")
+	}
+	$(".login .yzm .inputtxt").width(yzmw);
+}
+
+
+$(function(){
+	$(".loginform").Validform({
+		tiptype:function(msg,o,cssctl){
+			if(!o.obj.is("form")){
+				var objtip=o.obj.siblings(".Validform_checktip");
+				cssctl(objtip,o.type);
+				objtip.text(msg);
+			}
+		}
+	});
+});
+
+$('#login-button').click(function(){
+	var username = encodeURIComponent($("input[name='username']").val());
+	var password = encodeURIComponent($("input[name='password']").val());
+	var code = $("input[name='code']").val();
+	if(username == '' || password == ''){
+		layer.msg("表单错误,请重新输入!",{icon:2});
+		return;
+	}
+			
+	var data = 'username='+username+'&password='+password+'&code='+code;
+	var loadT = layer.msg("正在登录中...",{icon:16,time:0,shade: [0.3, '#000']});
+	$.post('/do_login',data,function(rdata){
+		// console.log('do_login',rdata);
+		layer.close(loadT);
+		if(!rdata.status || rdata.status < 0){
+			if(username == 'admin' && rdata.msg.indexOf('用户名') != -1){
+				rdata.msg += ', <br>获取默认用户和密码命令： mw default';
+			}
+			$("#error").html(rdata.msg);
+			$("input[name='password']").val('');
+			num = rdata.msg.substring(rdata.msg.indexOf('[')+1,rdata.msg.indexOf(']'))
+			if(num < 5){
+				var code_html = '<img width="100" height="40" class="passcode" onClick="this.src=this.src.split(\'?\')[0] + \'?\'+new Date().getTime()" src="/code" style="border: 1px solid #ccc; float: right;">';
+				$('#mw_yzm').html(code_html);
+				// $(".login").css("height","332px");
+				$("input[name='code']").val('');
+				$(".passcode").click();
+			}
+			$(".yzm").show();
+			wreset();
+			layer.msg(rdata.msg,{icon:2,time:5000});
+			return;
+		}
+
+		if (rdata.status == 2){
+			layer.prompt({
+			 	formType: 3,
+			 	value: '',
+			 	title: '二步验证',
+			}, function(value, index, elem){
+			 	$.post('/verify_login',{'auth':value,'username':username,'password':password},function(vdata){
+			 		if (vdata.status < 0){
+			 			layer.msg(vdata.msg,{icon:2,time:5000});
+			 			return;
+			 		}
+
+			 		layer.close(index);
+			 		window.location.href = '/';	
+			 	},'json');
+			  	
+			});
+			return;
+		}
+		
+		layer.msg(rdata.msg,{icon:16,time:0,shade: [0.3, '#000']});
+		window.location.href = '/';	
+	},'json');
+});
+
+</script>
 </body>
 </html>

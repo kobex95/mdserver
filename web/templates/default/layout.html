@@ -1,440 +1,146 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="renderer" content="webkit">
-    <title>{{data['title']}}</title>
-    <link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- ECharts -->
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- CodeMirror -->
-    <link href="/static/codemirror/lib/codemirror.css?v={{config.version}}" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        sidebar: '#1e293b',
-                        'sidebar-dark': '#0f172a',
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f3f4f6;
-        }
-        
-        /* 侧边栏激活状态 */
-        .nav-item.active {
-            background-color: #1e293b;
-            border-left: 3px solid #3b82f6;
-        }
-        
-        /* 隐藏滚动条但保留功能 */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        
-        /* 圆环进度条 */
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.35s;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
-        
-        /* 表格样式 */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .data-table th {
-            background-color: #f8fafc;
-            padding: 12px 16px;
-            text-align: left;
-            font-weight: 500;
-            color: #64748b;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .data-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .data-table tr:hover td {
-            background-color: #f8fafc;
-        }
-        
-        /* 按钮样式 */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-        .btn-primary {
-            background-color: #3b82f6;
-            color: white;
-        }
-        .btn-primary:hover {
-            background-color: #2563eb;
-        }
-        .btn-success {
-            background-color: #22c55e;
-            color: white;
-        }
-        .btn-success:hover {
-            background-color: #16a34a;
-        }
-        .btn-danger {
-            background-color: #ef4444;
-            color: white;
-        }
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
-        .btn-secondary {
-            background-color: #64748b;
-            color: white;
-        }
-        .btn-secondary:hover {
-            background-color: #475569;
-        }
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid #e2e8f0;
-            color: #64748b;
-        }
-        .btn-outline:hover {
-            background-color: #f8fafc;
-        }
-        
-        /* 输入框样式 */
-        .input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: all 0.2s;
-        }
-        .input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        /* 卡片样式 */
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        }
-        .card-header {
-            padding: 12px 20px;
-            border-bottom: 1px solid #f1f5f9;
-            font-weight: 500;
-            color: #475569;
-        }
-        .card-body {
-            padding: 20px;
-        }
-        
-        /* 标签页 */
-        .tabs {
-            display: flex;
-            gap: 24px;
-            border-bottom: 1px solid #f1f5f9;
-        }
-        .tab-item {
-            padding: 12px 0;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .tab-item:hover {
-            color: #475569;
-        }
-        .tab-item.active {
-            color: #22c55e;
-            border-bottom: 2px solid #22c55e;
-            margin-bottom: -1px;
-        }
-        
-        /* 开关 */
-        .switch {
-            position: relative;
-            width: 44px;
-            height: 24px;
-            background-color: #e2e8f0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .switch::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: all 0.3s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .switch.active {
-            background-color: #22c55e;
-        }
-        .switch.active::after {
-            left: 22px;
-        }
-        
-        /* 状态指示器 */
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-        .status-running {
-            background-color: #22c55e;
-            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
-        }
-        .status-stopped {
-            background-color: #ef4444;
-        }
-    </style>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="renderer" content="webkit">
+<title>{{data['title']}}</title>
+<link rel="shortcut icon" href="/static/favicon.ico" type="image/x-icon" />
+<link href="/static/bootstrap-3.3.5/css/bootstrap.min.css?v={{config.version}}" rel="stylesheet">
+<link href="/static/css/site.css?v={{config.version}}" rel="stylesheet">
+<link href="/static/codemirror/lib/codemirror.css?v={{config.version}}" rel="stylesheet">
+<script src="/static/language/Simplified_Chinese/lan.js?v={{config.version}}"></script>
+<!--[if lte IE 9]>
+	<script src="/static/js/requestAnimationFrame.js"></script>
+<![endif]-->
 
-    {% for menu in data['hook_menu'] %}
-    {% if menu['css_path'] and data['hook_tag'] == menu['name'] %}
-    <link href="/plugins/file?name={{menu['name']}}&v={{config.version}}&f={{menu['css_path']}}" rel="stylesheet" />
-    {% endif %}
-    {% endfor %}
 
-    {% for menu in data['hook_global_static'] %}
-    {% if menu['css_path'] %}
-    <link href="/plugins/file?name={{menu['name']}}&v={{config.version}}&f={{menu['css_path']}}" rel="stylesheet" />
-    {% endif %}
-    {% endfor %}
+{% for menu in data['hook_menu'] %}
+{% if menu['css_path'] and data['hook_tag'] == menu['name'] %}
+<!-- 加载插件css -->
+<link href="/plugins/file?name={{menu['name']}}&v={{config.version}}&f={{menu['css_path']}}" rel="stylesheet" />
+{% endif %}
+{% endfor %}
+
+<!-- 全局静态HOOK -->
+{% for menu in data['hook_global_static'] %}
+{% if menu['css_path'] %}
+<link href="/plugins/file?name={{menu['name']}}&v={{config.version}}&f={{menu['css_path']}}" rel="stylesheet" />
+{% endif %}
+{% endfor %}
 </head>
 
-<body class="flex h-screen overflow-hidden text-gray-600">
-
-    <!-- 左侧侧边栏 -->
-    <aside class="w-64 bg-slate-800 text-slate-300 flex flex-col shadow-xl z-20">
-        <!-- 顶部 IP 区域 -->
-        <div class="h-16 flex items-center justify-between px-4 bg-slate-900 border-b border-slate-700">
-            <div class="flex items-center gap-2">
-                <i class="fa-solid fa-server text-white"></i>
-                <span class="text-white font-mono text-sm">{{data['ip']}}</span>
-            </div>
-            <span class="bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full" id="task-count">0</span>
-        </div>
-
-        <!-- 导航菜单 -->
-        <nav class="flex-1 overflow-y-auto py-4 no-scrollbar">
-            <ul class="space-y-1">
-                <li>
-                    <a href="/" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-home">
-                        <i class="fa-solid fa-house w-6"></i>
-                        <span>首页</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/site/index" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-site">
-                        <i class="fa-solid fa-globe w-6"></i>
-                        <span>网站</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/monitor/index" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-monitor">
-                        <i class="fa-solid fa-chart-line w-6"></i>
-                        <span>监控</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/firewall/index" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-firewall">
-                        <i class="fa-solid fa-shield-halved w-6"></i>
-                        <span>安全</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/files/index" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-files">
-                        <i class="fa-regular fa-folder w-6"></i>
-                        <span>文件</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/logs/index" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-logs">
-                        <i class="fa-solid fa-list-ul w-6"></i>
-                        <span>日志</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/crontab/index" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-crontab">
-                        <i class="fa-regular fa-calendar-check w-6"></i>
-                        <span>计划任务</span>
-                    </a>
-                </li>
-                
-                <!-- 插件菜单 -->
-                {% for menu in data['hook_menu'] %}
-                <li>
-                    <a href="/plugins/menu?tag={{menu['name']}}" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-plugin-{{menu['name']}}">
-                        <i class="fa-solid fa-puzzle-piece w-6"></i>
-                        <span>{{menu['title']}}</span>
-                    </a>
-                </li>
-                {% endfor %}
-                
-                <li>
-                    <a href="/soft/index" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-soft">
-                        <i class="fa-solid fa-box-open w-6"></i>
-                        <span>软件管理</span>
-                        <span class="ml-auto bg-slate-600 text-xs px-2 py-0.5 rounded" id="soft-num">0</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="/setting/index" class="nav-item flex items-center px-6 py-3 hover:bg-slate-700 transition-colors" id="menu-setting">
-                        <i class="fa-solid fa-sliders w-6"></i>
-                        <span>面板设置</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- 底部退出 -->
-        <div class="p-4 border-t border-slate-700">
-            <a href="javascript:;" id="signout" class="flex items-center px-2 py-3 hover:bg-slate-700 rounded transition-colors text-red-400">
-                <i class="fa-solid fa-right-from-bracket w-6"></i>
-                <span>退出</span>
-            </a>
-            <div class="flex justify-center mt-2">
-                <button class="w-8 h-8 rounded bg-slate-700 hover:bg-slate-600 text-white flex items-center justify-center" onclick="bindPanel(0,'b')">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-        </div>
-    </aside>
-
-    <!-- 右侧主内容区 -->
-    <main class="flex-1 flex flex-col h-screen overflow-hidden">
-        
-        <!-- 顶部 Header -->
-        <header class="h-14 bg-white border-b border-gray-200 flex items-center justify-between px-6 shadow-sm z-10">
-            <div class="flex items-center gap-4 text-sm text-gray-500">
-                <div class="flex items-center gap-2">
-                    <i class="fa-brands fa-linux"></i>
-                    <span>系统: <span id="system-info">获取中...</span></span>
+<body>
+    <div class="bt-warp bge6">
+        <div id="container" class="container-fluid">
+            <div class="sidebar-scroll">
+                <div class="sidebar-auto">
+                    <div id="task" class="task cw" onclick="messageBox();"></div>
+                    <h3 class="mypcip"><span class="f14 cw">{{data['ip']}}</span></h3>
+                    <ul class="menu">
+                        <li id="memuA"><a class="menu_home" href="/">首页</a></li>
+                        <li id="memuAsite"><a class="menu_web" href="/site/index">网站</a></li>
+                        <li id="memuAmonitor"><a class="menu_control" href="/monitor/index">监控</a></li>
+                        <li id="memuAfirewall"><a class="menu_firewall" href="/firewall/index">安全</a></li>
+                        <li id="memuAfiles"><a class="menu_folder" href="/files/index">文件</a></li>
+                        <li id="memuAlogs"><a class="menu_logs" href="/logs/index">日志</a></li>                        
+                        <li id="memuAcrontab"><a class="menu_day" href="/crontab/index">计划任务</a></li>
+                        <!-- 插件设置的菜单 -->
+                        {% for menu in data['hook_menu'] %}
+                        <li id="memuAplugins_{{menu['name']}}">
+                            <a class="menu_plugin_{{menu['name']}}" href="/plugins/menu?tag={{menu['name']}}">{{menu['title']}}</a>
+                        </li>
+                        {% endfor %}
+                        <li id="memuAsoft"><a class="menu_soft" href="/soft/index">软件管理</a><span class="softnum">1</span></li>
+                        <li id="memuAsetting"><a class="menu_set" href="/setting/index">面板设置</a></li>
+                        <li><a class="menu_exit" href="javascript:;" id="signout">退出</a></li>
+                    </ul>
+                    <div id="newbtpc"></div>
+                    <div class="btpc-plus" onclick="bindPanel(0,'b')">+</div>
                 </div>
-                <div class="w-px h-4 bg-gray-300"></div>
-                <span>已不间断运行: <span id="run-time">获取中...</span></span>
             </div>
-            <div class="flex items-center gap-4 text-sm">
-                <span class="text-gray-400" id="version">{{config.version}}</span>
-                <button class="text-green-600 hover:underline" onclick="checkUpdate()">更新</button>
-                <span class="text-gray-300">|</span>
-                <button class="text-green-600 hover:underline" onclick="reBoot()">重启</button>
-            </div>
-        </header>
-
-        <!-- 内容滚动区域 -->
-        <div class="flex-1 overflow-y-auto p-6 no-scrollbar" id="main-content">
+            <button style="display: none;" id="mw_copys" class="mw_copy" data-clipboard-text=""></button>
+            <link rel="stylesheet" href="/static/build/xterm.css?v={{config.version}}">
+            <link rel="stylesheet" href="/static/build/addons/fullscreen/fullscreen.css?v={{config.version}}">
+            <script src="/static/js/jquery-1.10.2.min.js"></script>
+            <script src="/static/js/jquery.cookie-1.4.1.min.js"></script>
+            <script src="/static/js/bootstrap.min.js"></script>
+            <script src="/static/layer/layer.js"></script>
+            <script src="/static/js/jquery.fly.min.js"></script>
+            <script src="/static/js/clipboard.min.js"></script>
+            <script src="/static/build/xterm.js"></script>
+            <script src="/static/build/addons/attach/attach.js"></script>
+            <script src="/static/build/addons/fit/fit.js"></script>
+            <script src="/static/build/addons/fullscreen/fullscreen.js"></script>
+            <script src="/static/js/socket.io.min.js"></script>
+            <script src="/static/build/addons/winptyCompat/winptyCompat.js"></script>
+            <script src="/static/js/term-websocketio.js"></script>
+            <script src="/static/app/upload.js?v={{config.version}}"></script>
+            <script src="/static/app/public.js?v={{config.version}}"></script>
+            <script src="/static/js/echarts.min.js"></script>
+            <!-- <script src="//unpkg.com/echarts@5.4.3/dist/echarts.min.js"></script> -->
+            
+            <script src="/static/js/jquery.dragsort-0.5.2.min.js"></script>
+            <script src="/static/js/jquery-qrcode-0.18.0.min.js?v={{config.version}}"></script>
+            <script src="/static/js/xm-select.js"></script>
+            
             {% block content %}{% endblock %}
+            <div class="footer bgw">mdserver-web &copy;2018-∞ Linux面板 (<a class="btlink" target="_blank" href="//github.com/kobex95/mdserver">源码</a>) <span style="margin-left:5px;">/</span>
+                <a class="btlink" target="_blank" style="margin-left:5px;" href="//github.com/kobex95/mdserver/wiki">WIKI</a>
+            </div>
         </div>
-    </main>
-
-    <!-- 隐藏的复制按钮 -->
-    <button style="display: none;" id="mw_copys" class="mw_copy" data-clipboard-text=""></button>
-
-    <!-- JavaScript -->
-    <script src="/static/js/jquery-1.10.2.min.js"></script>
-    <script src="/static/js/jquery.cookie-1.4.1.min.js"></script>
-    <script src="/static/layer/layer.js"></script>
-    <script src="/static/js/clipboard.min.js"></script>
-    <script src="/static/js/socket.io.min.js"></script>
-    <script src="/static/app/public.js?v={{config.version}}"></script>
-    
-    <!-- CodeMirror -->
-    <script src="/static/codemirror/lib/codemirror.js?v={{config.version}}"></script>
-    <script src="/static/codemirror/addon/edit/editAll.js?v={{config.version}}"></script>
-    <script src="/static/codemirror/mode/modeAll.js?v={{config.version}}"></script>
-    <script src="/static/laydate/laydate.js?v={{config.version}}"></script>
-
-    <!-- 插件 JS -->
-    {% for menu in data['hook_menu'] %}
-    {% if menu['js_path'] and data['hook_tag'] == menu['name'] %}
-    <script src="/plugins/file?name={{menu['name']}}&f={{menu['js_path']}}&v={{config.version}}"></script>
-    {% endif %}
-    {% endfor %}
-
-    {% for menu in data['hook_global_static'] %}
-    {% if menu['js_path'] %}
-    <script src="/plugins/file?name={{menu['name']}}&f={{menu['js_path']}}&v={{config.version}}"></script>
-    {% endif %}
-    {% endfor %}
-
-    <script type="text/javascript">
-    (function ($) {
-        $.getUrlParam = function(name) {
-            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
-            var r = window.location.search.substr(1).match(reg);
-            if (r != null) return unescape(r[2]); return null;
-        }
-    })(jQuery);
-
-    // 高亮当前菜单
-    var thisPath = window.location.pathname.trim() + window.location.search;
-    if (thisPath.indexOf('?') > -1) {
-        var tag = $.getUrlParam('tag');
-        if (tag != undefined) {
-            $('#menu-plugin-' + tag).addClass('active');
-        }
-    } else {
-        if (thisPath != '/') {
-            var pathArr = thisPath.substring(1).split('/');
-            var menuId = '#menu-' + pathArr[0];
-            $(menuId).addClass('active');
-        } else {
-            $('#menu-home').addClass('active');
-        }
-    }
-
-    // 退出登录
-    $('#signout').click(function() {
-        layer.confirm('确定要退出登录吗?', {icon: 3, title:'提示'}, function(index){
-            $.post('/do_login', 'logout=true', function(rdata){
-                layer.msg(rdata.msg, {icon: rdata.status ? 1 : 2});
-                if (rdata.status) {
-                    setTimeout(function(){
-                        window.location.href = '/login';
-                    }, 1000);
-                }
-            }, 'json');
-            layer.close(index);
-        });
-    });
-    </script>
+    </div>
 </body>
+
+<script type="text/javascript">
+
+(function ($) {
+    $.getUrlParam = function (name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]); return null;
+    }
+})(jQuery);
+
+
+var thisPath = window.location.pathname.trim()+window.location.search;
+if (thisPath.indexOf('?')>-1){
+    var tag = $.getUrlParam('tag');
+    if(tag != undefined){
+        $('#memuAplugins_'+tag).css('background-color','#2c3138');
+    }
+} else{
+    if(thisPath != '/'){
+        var pathArr = thisPath.substring(1).split('/');
+        $('#memuA'+pathArr[0]).css('background-color','#2c3138');
+    } else{
+        $('#memuA').css('background-color','#2c3138');
+    }
+}
+</script>
+<script src="/static/codemirror/lib/codemirror.js?v={{config.version}}"></script>
+<script src="/static/codemirror/addon/edit/editAll.js?v={{config.version}}"></script>
+<script src="/static/codemirror/mode/modeAll.js?v={{config.version}}"></script>
+<script src="/static/codemirror/addon/dialog/dialog.js?v={{config.version}}"></script>
+<script src="/static/codemirror/addon/search/search.js?v={{config.version}}"></script>
+<script src="/static/codemirror/addon/scroll/annotatescrollbar.js?v={{config.version}}"></script>
+<script src="/static/laydate/laydate.js?v={{config.version}}"></script>
+
+{% for menu in data['hook_menu'] %}
+{% if menu['js_path'] and data['hook_tag'] == menu['name'] %}
+<script src="/plugins/file?name={{menu['name']}}&f={{menu['js_path']}}&v={{config.version}}"></script>
+{% endif %}
+{% endfor %}
+
+<!-- 全局静态HOOK -->
+{% for menu in data['hook_global_static'] %}
+{% if menu['js_path'] %}
+<script src="/plugins/file?name={{menu['name']}}&f={{menu['js_path']}}&v={{config.version}}"></script>
+{% endif %}
+{% endfor %}
+
+
+
+
 </html>
