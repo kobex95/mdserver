@@ -170,13 +170,18 @@ create_directories() {
 download_panel() {
     local install_dir="/www/server/mdserver-web"
     
-    # 如果目录存在但为空，则删除重新下载
+    # 检查目录是否存在且包含关键文件
     if [[ -d "$install_dir" ]]; then
-        if [[ -z "$(ls -A "$install_dir" 2>/dev/null)" ]]; then
-            rm -rf "$install_dir"
-        else
-            echo -e "${YELLOW}检测到已存在安装目录，跳过下载${PLAIN}"
+        # 检查关键文件是否存在
+        if [[ -f "$install_dir/scripts/lib.sh" && -f "$install_dir/web/app.py" ]]; then
+            echo -e "${YELLOW}检测到已存在完整安装，跳过下载${PLAIN}"
             return 0
+        else
+            echo -e "${YELLOW}检测到安装目录不完整，将重新下载${PLAIN}"
+            # 备份数据
+            mv "$install_dir/data" /tmp/mw_data_backup 2>/dev/null || true
+            mv "$install_dir/ssl" /tmp/mw_ssl_backup 2>/dev/null || true
+            rm -rf "$install_dir"
         fi
     fi
     
@@ -203,6 +208,14 @@ download_panel() {
     
     mv -f "$extracted_dir" "$install_dir"
     rm -f "$tmp_file"
+    
+    # 恢复备份的数据
+    if [[ -d /tmp/mw_data_backup ]]; then
+        mv /tmp/mw_data_backup "$install_dir/data"
+    fi
+    if [[ -d /tmp/mw_ssl_backup ]]; then
+        mv /tmp/mw_ssl_backup "$install_dir/ssl"
+    fi
     
     # 创建必要的子目录
     mkdir -p "$install_dir/data"
@@ -238,19 +251,6 @@ install_acme() {
 install_libs() {
     echo -e "${BLUE}正在安装依赖库...${PLAIN}"
     cd /www/server/mdserver-web
-    
-    # 调试信息
-    echo "当前目录: $(pwd)"
-    echo "目录内容:"
-    ls -la
-    
-    if [ ! -f "scripts/lib.sh" ]; then
-        echo -e "${ERROR} scripts/lib.sh 不存在，尝试重新下载..."
-        # 手动下载 lib.sh
-        curl -fsSL -o scripts/lib.sh "https://${RAW_HOST}/master/scripts/lib.sh" || \
-        wget --no-check-certificate -O scripts/lib.sh "https://${RAW_HOST}/master/scripts/lib.sh"
-    fi
-    
     bash scripts/lib.sh
 }
 
