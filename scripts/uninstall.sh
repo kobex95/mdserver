@@ -191,6 +191,9 @@ uninstall_panel() {
     rm -f /etc/init.d/mw
     rm -f /etc/rc.d/init.d/mw
     rm -f /lib/systemd/system/mw.service
+    rm -f /usr/lib/systemd/system/mw.service
+    rm -f /usr/lib/systemd/system/mw-panel.service
+    rm -f /usr/lib/systemd/system/mw-tasks.service
     
     # 删除 crontab
     crontab -l 2>/dev/null | grep -v "mdserver-web" | crontab - 2>/dev/null || true
@@ -208,6 +211,14 @@ cleanup() {
     # 删除日志
     rm -f /var/log/mw-install.log
     rm -f /var/log/mw-update.log
+    
+    # 删除临时文件
+    rm -rf /tmp/mdserver*
+    rm -rf /tmp/mw_*
+    rm -rf /tmp/pip*
+    
+    # 删除 pip 缓存
+    rm -rf /root/.cache/pip
     
     # 删除 acme.sh（可选）
     read -p "是否删除 acme.sh SSL证书工具? [yes/no]: " del_acme
