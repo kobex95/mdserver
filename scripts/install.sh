@@ -83,9 +83,11 @@ install_base_deps() {
             debian|ubuntu)
                 apt-get update > /dev/null 2>&1
                 apt-get install -y wget curl zip unzip tar cron python3 python3-venv python3-pip > /dev/null 2>&1
+                apt-get install -y python3-flask python3-gunicorn python3-eventlet python3-psutil > /dev/null 2>&1 || true
                 ;;
             centos|rhel|rocky|almalinux|anolis|fedora)
                 yum install -y wget curl zip unzip tar crontabs python3 python3-pip > /dev/null 2>&1
+                yum install -y python3-flask python3-gunicorn python3-eventlet python3-psutil > /dev/null 2>&1 || true
                 ;;
             alpine)
                 apk update > /dev/null 2>&1
@@ -112,6 +114,12 @@ install_base_deps() {
         exit 1
     fi
     echo -e "${SUCCESS} Python3 安装完成: $(python3 --version)"
+    
+    # 安装Python依赖包
+    echo -e "${BLUE}正在安装Python依赖...${PLAIN}"
+    pip3 install flask gunicorn eventlet psutil --break-system-packages > /dev/null 2>&1 || \
+    pip3 install flask gunicorn eventlet psutil > /dev/null 2>&1 || \
+    echo -e "${WARN} pip安装依赖失败，将尝试使用系统包"
 }
 
 # 检测操作系统(只检测，不安装)
