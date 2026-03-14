@@ -65,9 +65,21 @@ mw stop 2>/dev/null || true
 green "正在更新文件..."
 cd ${TEMP_DIR}/mdserver-master
 
-# 保留数据目录，只更新代码
-rsync -av --exclude='data/*' --exclude='ssl/*' --exclude='logs/*' --exclude='*.pyc' \
-    ./ ${PANEL_DIR}/
+# 备份并清理旧代码（保留数据目录）
+mv ${PANEL_DIR}/data ${BACKUP_DIR}/data_backup 2>/dev/null || true
+mv ${PANEL_DIR}/ssl ${BACKUP_DIR}/ssl_backup 2>/dev/null || true
+mv ${PANEL_DIR}/logs ${BACKUP_DIR}/logs_backup 2>/dev/null || true
+
+# 删除旧代码
+rm -rf ${PANEL_DIR}/*
+
+# 复制新代码
+cp -rf ./* ${PANEL_DIR}/
+
+# 恢复数据目录
+mv ${BACKUP_DIR}/data_backup ${PANEL_DIR}/data 2>/dev/null || true
+mv ${BACKUP_DIR}/ssl_backup ${PANEL_DIR}/ssl 2>/dev/null || true
+mv ${BACKUP_DIR}/logs_backup ${PANEL_DIR}/logs 2>/dev/null || true
 
 # 恢复版本文件（保留原版本号）
 if [ -f ${BACKUP_DIR}/version.py ]; then
