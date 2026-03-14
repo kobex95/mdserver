@@ -44,6 +44,13 @@ fi
 green "正在解压..."
 unzip -q master.zip
 
+# 查找解压后的目录
+EXTRACTED_DIR=$(ls -d ${TEMP_DIR}/mdserver* 2>/dev/null | head -1)
+if [ -z "$EXTRACTED_DIR" ]; then
+    red "解压失败，找不到目录"
+    exit 1
+fi
+
 # 备份当前配置
 green "正在备份配置文件..."
 mkdir -p ${BACKUP_DIR}
@@ -63,7 +70,7 @@ mw stop 2>/dev/null || true
 
 # 更新文件
 green "正在更新文件..."
-cd ${TEMP_DIR}/mdserver-master
+cd ${EXTRACTED_DIR}
 
 # 备份并清理旧代码（保留数据目录）
 mv ${PANEL_DIR}/data ${BACKUP_DIR}/data_backup 2>/dev/null || true
