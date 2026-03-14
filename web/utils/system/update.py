@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------------
 # MW-Linux面板
 # ---------------------------------------------------------------------------------
-# copyright (c) 2018-∞(https://github.com/midoks/mdserver-web) All rights reserved.
+# copyright (c) 2018-∞(https://github.com/kobex95/mdserver) All rights reserved.
 # ---------------------------------------------------------------------------------
 # Author: midoks <midoks@163.com>
 # ---------------------------------------------------------------------------------
@@ -97,14 +97,14 @@ def updateServer(stype, version=''):
             if not os.path.exists(dist_mw):
                 mw.execShell('wget --no-check-certificate -O ' + dist_mw + ' ' + newUrl)
 
-            dist_to = toPath + "/mdserver-web-" + version
+            dist_to = toPath + "/mdserver-" + version
             if not os.path.exists(dist_to):
                 os.system('unzip -o ' + toPath + '/mw.zip' + ' -d ' + toPath)
 
             cmd_cp = 'cp -rf ' + toPath + '/mdserver-web-' + version + '/* ' + mw.getServerDir() + '/mdserver-web'
             mw.execShell(cmd_cp)
 
-            mw.execShell('rm -rf ' + toPath + '/mdserver-web-' + version)
+            mw.execShell('rm -rf ' + toPath + '/mdserver-' + version)
             mw.execShell('rm -rf ' + toPath + '/mw.zip')
 
             update_env = '''
