@@ -9,7 +9,7 @@
 	"todo_versions":["5.7","8.0"],
 	"versions":["5.7","8.0","8.2","8.3","8.4","9.0","9.1","9.2","9.3"],
 	"shell":"install.sh",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"uninstall_pre_inspection":true,
 	"checks":"server/mysql-community",
 	"path":"server/mysql-community",

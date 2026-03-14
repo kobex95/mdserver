@@ -7,7 +7,7 @@
 	"type":"运行环境",
 	"ps":"功能强大的开源数据库",
 	"coexist": false,
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"uninstall_pre_inspection":true,
 	"versions":["14","15","16","17"],
 	"shell":"install.sh",

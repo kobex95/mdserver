@@ -17,7 +17,7 @@
 	"name":"op_waf",
 	"type":"安全插件",
 	"ps":"全面Web应用防火墙，支持SQL注入/XSS/CC攻击/Bot管理/敏感数据保护/Log4j/SSRF等高级防护",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"shell":"install.sh",
 	"checks":"server/op_waf",
 	"path":"server/op_waf",

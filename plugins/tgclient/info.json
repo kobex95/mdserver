@@ -8,7 +8,7 @@
 	"tip": "soft",
 	"checks": "server/tgclient",
 	"path": "server/tgclient",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"uninstall_pre_inspection":true,
 	"display": 1,
 	"author": "midoks",

@@ -18,7 +18,7 @@
 	"shell": "install.sh",
 	"versions":"0.2.5",
 	"tip": "soft",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"uninstall_pre_inspection":true,
 	"checks": "server/webstats/version.pl",
 	"path": "server/webstats",

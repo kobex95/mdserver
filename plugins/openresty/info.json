@@ -6,7 +6,7 @@
 	"type":"其他插件",
 	"ps":"轻量级，占有内存少，并发能力强",
 	"shell":"install.sh",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"checks":"server/openresty",
 	"path":"server/openresty",
 	"author":"agentzh",

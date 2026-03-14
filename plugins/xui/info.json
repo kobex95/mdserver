@@ -1,7 +1,7 @@
 {
 	"sort": 7,
 	"ps": "支持多协议多用户的xray面板",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"name": "xui",
 	"title": "xui",
 	"shell": "install.sh",

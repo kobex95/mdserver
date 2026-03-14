@@ -6,7 +6,7 @@
 	"shell": "install.sh",
 	"versions":["7.4.6"],
 	"tip": "soft",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"checks": "server/manticoresearch",
 	"path": "server/manticoresearch",
 	"display": 1,

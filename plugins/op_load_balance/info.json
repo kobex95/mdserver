@@ -4,7 +4,7 @@
 	"tip":"soft",
 	"name":"op_load_balance",
 	"type":"其他插件",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"ps":"基于OpenResty的负载均衡",
 	"shell":"install.sh",
 	"checks":"server/op_load_balance",

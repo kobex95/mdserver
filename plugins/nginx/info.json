@@ -6,7 +6,7 @@
 	"type":"运行环境",
 	"ps":"高性能的HTTP和反向代理服务器",
 	"shell":"install.sh",
-	"install_pre_inspection":true,
+	"install_pre_inspection":false,
 	"checks":"server/nginx",
 	"path":"server/nginx",
 	"author":"Igor Sysoev",
